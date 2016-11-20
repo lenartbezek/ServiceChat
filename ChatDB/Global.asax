@@ -1,1 +1,1 @@
-﻿<%@ Application Codebehind="Global.asax.cs" Inherits="NoDB.Global" Language="C#" %>
+﻿<%@ Application Codebehind="Global.asax.cs" Inherits="ChatDB.Global" Language="C#" %>
