@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Text;
 
@@ -14,8 +15,15 @@ namespace ChatDB
 
         private string _hashedPassword;
 
+        /// <summary>
+        /// Creates a new User with given data and returns it.
+        /// Returns null if user already exists.
+        /// </summary>
         public static User Create(string firstname, string lastname, string username, string password)
         {
+            if (Get(username) != null)
+                return null;
+
             var newUser = new User
             {
                 FirstName = firstname,
@@ -29,6 +37,10 @@ namespace ChatDB
             return newUser;
         }
 
+        /// <summary>
+        /// Finds and returns User with given username.
+        /// Returns null if such user is not found,
+        /// </summary>
         public static User Get(string username)
         {
             User user = null;
@@ -58,6 +70,9 @@ namespace ChatDB
             return user;
         }
 
+        /// <summary>
+        /// Returns a list of all registered users.
+        /// </summary>
         public static List<User> GetAll()
         {
             var list = new List<User>();
@@ -102,8 +117,12 @@ namespace ChatDB
 
             return sb.ToString();
         }
-
-        private bool VerifyPassword(string password)
+       
+        /// <summary>
+        /// Verifies the password against the stored hash.
+        /// Returns true if valid.
+        /// </summary>
+        public bool VerifyPassword(string password)
         {
             return _hashedPassword == Hash(password);
         }
@@ -115,14 +134,14 @@ namespace ChatDB
 
             SqlCommand command = new SqlCommand(
                 "BEGIN TRANSACTION "+
-                "IF EXISTS (SELECT * FROM Uporabniki WITH (updlock,serializable) WHERE username=@username) "+
+                "IF EXISTS (SELECT * FROM Uporabnik WITH (updlock,serializable) WHERE username=@username) "+
                 "BEGIN "+
-                "   UPDATE Uporabniki SET ime=@firstname, priimek=@lastname, geslo=@hash "+
+                "   UPDATE Uporabnik SET ime=@firstname, priimek=@lastname, geslo=@hash "+
                 "   WHERE username=@username "+
                 "END "+
                 "ELSE "+
                 "BEGIN "+
-                "   INSERT INTO Uporabniki (username, ime, priimek, geslo) "+
+                "   INSERT INTO Uporabnik (username, ime, priimek, geslo) "+
                 "   VALUES (@username, @firstname, @lastname, @hash) "+
                 "END "+
                 "COMMIT TRANSACTION",
