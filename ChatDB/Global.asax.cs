@@ -44,6 +44,10 @@ namespace ChatDB
 
         public static void RegisterRoutes(RouteCollection routes)
         {
+            routes.RouteExistingFiles = true;
+            routes.MapPageRoute("Login",
+                "login",
+                "~/Login.aspx");
             routes.MapPageRoute("Default",
                 "",
                 "~/Chat.aspx");

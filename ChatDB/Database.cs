@@ -8,7 +8,7 @@ namespace ChatDB
 {
     public class Database
     {
-        public static string ConnectionString = System.Web.Configuration
+        public static string ConnectionString { get; } = System.Web.Configuration
             .WebConfigurationManager
             .OpenWebConfiguration("/Web")
             .ConnectionStrings.ConnectionStrings["SQL_Connection"].ConnectionString;
