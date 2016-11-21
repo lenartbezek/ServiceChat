@@ -16,7 +16,8 @@
 </head>
 <body>
     <div class="container">
-        <h2>ChatDB</h2>
+        <h2>ChatDB™</h2>
+        <hr />
         <asp:contentplaceholder id="Content" runat="server" />
     </div>
 </body>

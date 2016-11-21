@@ -10,9 +10,23 @@ namespace ChatDB
 {
     public partial class Chat : Page
     {
+        public List<Message> MessageList { get; } = new List<Message>(); //Message.GetAllWithAuthors();
+
         protected void Page_Load(object sender, EventArgs e)
         {
 
+        }
+
+        protected void SendButton_Click(object sender, EventArgs e)
+        {
+            var m = MessageField.Text.Trim();
+            if (m.Length > 0)
+                Message.Create(Context.User.Identity.Name, m);
+        }
+
+        protected void RefreshButton_Click(object sender, EventArgs e)
+        {
+            Response.RedirectToRoute("Default");
         }
 
         protected void LogoutButton_Click(object sender, EventArgs e)
