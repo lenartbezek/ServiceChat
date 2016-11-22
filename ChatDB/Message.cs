@@ -30,7 +30,7 @@ namespace ChatDB
         public Account Author { get; private set; }
         public DateTime Time { get; private set; }
 
-        public static Message Create(string username, string text, DateTime time)
+        public static Message Create(string username, string text)
         {
             var newMessage = new Message
             {
@@ -59,7 +59,8 @@ namespace ChatDB
             SqlCommand command = new SqlCommand(
                 "SELECT username, besedilo, time "+
                 "FROM Pogovor "+
-                "WHERE id=@id", 
+                "WHERE id=@id "+
+                "ORDER BY time DESC",
                 conn);
 
             command.Parameters.AddWithValue("@id", id);
@@ -97,7 +98,8 @@ namespace ChatDB
 
             SqlCommand command = new SqlCommand(
                 "SELECT username, besedilo, time "+
-                "FROM Pogovor", 
+                "FROM Pogovor "+
+                "ORDER BY time DESC", 
                 conn);
 
             using (SqlDataReader reader = command.ExecuteReader())
@@ -123,7 +125,7 @@ namespace ChatDB
         /// <summary>
         /// Returns a list of all messages with author's name and surname before them.
         /// </summary>
-        public static List<Message> GetAllWithAuthors()
+        /*public static List<Message> GetAllWithAuthors()
         {
             var list = new List<Message>();
 
@@ -147,11 +149,6 @@ namespace ChatDB
                         Time = (DateTime)reader["time"]
                     };
 
-                    var author = new Account
-                    {
-
-                    };
-
                     list.Add(message);
                 }
             }
@@ -159,7 +156,7 @@ namespace ChatDB
             conn.Close();
 
             return list;
-        }
+        }*/
 
         private void Create()
         {
@@ -170,9 +167,11 @@ namespace ChatDB
                 "INSERT INTO Pogovor (username, besedilo, time) " +
                 "VALUES (@username, @besedilo, @time) ",
                 conn);
+
             command.Parameters.AddWithValue("@username", this.Username);
             command.Parameters.AddWithValue("@besedilo", this.Text);
             command.Parameters.AddWithValue("@time", this.Time);
+
 
             command.ExecuteNonQuery();
 
