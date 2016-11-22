@@ -4,7 +4,7 @@
 
     <form runat="server" class="row">
 
-        <div class="col s12 m6 l4 offset-l1">
+        <div class="col s12 m6 l4 offset-l2">
             <div class="center-align">
                 <h4>Registracija</h4>
                 <h6>Novi uporabniki</h6>
