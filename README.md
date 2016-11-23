@@ -20,3 +20,12 @@ http://chatdb.azurewebsites.net/
 * Responsive mobile-first design
 * Memory cache za podatke o uporabnikih
 * Gostovanje na Azure oblaku
+
+## Premagane težave
+Najprej sva imela težave z povezavo na lokalno podatkovno bazo. Za hranjenje zaporedja sporočil v podatkovni bazi sva implementirala tudi čas, kar je prineslo težave s časovnimi pasovi. To sva rešila z UTC formatom.
+
+## Predlagane izboljšave
+Pošiljanje sporočil preko postbacka je potratno in zahteva osveževanje s strani uporabnika. To bi se rešilo z uporabo WebSocket protokola, obenem pa precej zmanjšalo obremenitev strežnika in povezave. Po temu bi bilo precej enostavno implementirati tudi brisanje in urejanje sporočil.
+
+![screenshot](https://puu.sh/srW5e/b772ad8f4a.png)
+
