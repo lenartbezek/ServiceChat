@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -25,10 +25,16 @@ namespace ChatDB
         protected void LoginButton_Click(object sender, EventArgs e)
         {
             if (UsernameField.Text.Trim().Length <= 0)
+            {
                 UsernameError = "Vnesite uporabniško ime";
+                return;
+            }
 
             if (PasswordField.Text.Trim().Length <= 0)
+            {
                 PasswordError = "Vnesite geslo";
+                return;
+            }
 
             try
             {
@@ -53,7 +59,10 @@ namespace ChatDB
                 lastName += " " + list[i];
 
             if (RegisterPasswordField.Text != RegisterPasswordRepeatField.Text)
+            {
                 RegisterPasswordRepeatError = "Gesli se ne ujemata";
+                return;
+            }
 
             try
             {
