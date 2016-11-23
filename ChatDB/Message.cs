@@ -1,19 +1,18 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Text;
 using System.Linq;
 using System.Web;
-using static ChatDB.Account;
 
 namespace ChatDB
 {
     /*
      * CREATE TABLE [dbo].[Pogovor] (
-     * [id]       INT          NOT NULL,
-     * [username] VARCHAR (50) NOT NULL,
-     * [besedilo] TEXT         NOT NULL,
-     * [time] DATETIME NOT NULL, 
+     * [id]       INT IDENTITY(1, 1) NOT NULL,
+     * [username] VARCHAR (50)       NOT NULL,
+     * [besedilo] TEXT               NOT NULL,
+     * [time] DATETIME               NOT NULL,
      * PRIMARY KEY CLUSTERED ([id] ASC)
      * );
      */
@@ -27,7 +26,6 @@ namespace ChatDB
         public int Id { get; private set; }
         public string Text { get; private set; }
         public string Username { get; private set; }
-        public Account Author { get; private set; }
         public DateTime Time { get; private set; }
 
         public static Message Create(string username, string text)
@@ -37,12 +35,11 @@ namespace ChatDB
                 Username = username,
                 Text = text,
                 Time = DateTime.UtcNow
-
             };
 
             newMessage.Create();
             return newMessage;
-            
+
         }
 
         /// <summary>
@@ -57,10 +54,9 @@ namespace ChatDB
             conn.Open();
 
             SqlCommand command = new SqlCommand(
-                "SELECT username, besedilo, time "+
-                "FROM Pogovor "+
-                "WHERE id=@id "+
-                "ORDER BY time DESC",
+                "SELECT * " +
+                "FROM Pogovor " +
+                "WHERE id=@id ",
                 conn);
 
             command.Parameters.AddWithValue("@id", id);
@@ -71,9 +67,10 @@ namespace ChatDB
                 {
                     message = new Message
                     {
+                        Id = id,
                         Username = (string)reader["username"],
                         Text = (string)reader["besedilo"],
-                        Time = (DateTime)reader["time"]
+                        Time = ((DateTime)reader["time"]).ToUniversalTime()
                     };
                 }
             }
@@ -81,7 +78,7 @@ namespace ChatDB
             conn.Close();
 
             if (message == null)
-                throw new IdNotFoundException(); 
+                throw new IdNotFoundException();
 
             return message;
         }
@@ -97,9 +94,9 @@ namespace ChatDB
             conn.Open();
 
             SqlCommand command = new SqlCommand(
-                "SELECT username, besedilo, time "+
-                "FROM Pogovor "+
-                "ORDER BY time DESC", 
+                "SELECT * " +
+                "FROM Pogovor " +
+                "ORDER BY time ASC ",
                 conn);
 
             using (SqlDataReader reader = command.ExecuteReader())
@@ -108,9 +105,10 @@ namespace ChatDB
                 {
                     var message = new Message
                     {
+                        Id = (int)reader["id"],
                         Username = (string)reader["username"],
                         Text = (string)reader["besedilo"],
-                        Time = (DateTime)reader["time"]
+                        Time = ((DateTime)reader["time"]).ToLocalTime()
                     };
 
                     list.Add(message);
@@ -123,9 +121,9 @@ namespace ChatDB
         }
 
         /// <summary>
-        /// Returns a list of all messages with author's name and surname before them.
+        /// Returns a list of all messages since given date.
         /// </summary>
-        /*public static List<Message> GetAllWithAuthors()
+        public static List<Message> GetSince(DateTime time)
         {
             var list = new List<Message>();
 
@@ -133,10 +131,13 @@ namespace ChatDB
             conn.Open();
 
             SqlCommand command = new SqlCommand(
-                "SELECT u.ime, u.priimek, p.username, p.besedilo "+
-                "FROM Uporabnik AS u "+
-                "INNER JOIN Pogovor AS p "+
-                "ON u.username=p.id; ", conn);
+                "SELECT * " +
+                "FROM Pogovor " +
+                "WHERE time > @time "+
+                "ORDER BY time ASC ",
+                conn);
+
+            command.Parameters.AddWithValue("@time", time);
 
             using (SqlDataReader reader = command.ExecuteReader())
             {
@@ -144,9 +145,10 @@ namespace ChatDB
                 {
                     var message = new Message
                     {
-                        Username = (string)reader["ime"] + " " + (string)reader["priimek"]+ " " + (string)reader["username"],
+                        Id = (int)reader["id"],
+                        Username = (string)reader["username"],
                         Text = (string)reader["besedilo"],
-                        Time = (DateTime)reader["time"]
+                        Time = ((DateTime)reader["time"]).ToLocalTime()
                     };
 
                     list.Add(message);
@@ -156,7 +158,7 @@ namespace ChatDB
             conn.Close();
 
             return list;
-        }*/
+        }
 
         private void Create()
         {
@@ -165,6 +167,7 @@ namespace ChatDB
 
             SqlCommand command = new SqlCommand(
                 "INSERT INTO Pogovor (username, besedilo, time) " +
+                "OUTPUT INSERTED.id " +
                 "VALUES (@username, @besedilo, @time) ",
                 conn);
 
@@ -172,8 +175,7 @@ namespace ChatDB
             command.Parameters.AddWithValue("@besedilo", this.Text);
             command.Parameters.AddWithValue("@time", this.Time);
 
-
-            command.ExecuteNonQuery();
+            Id = (int)command.ExecuteScalar();
 
             conn.Close();
         }
@@ -184,10 +186,10 @@ namespace ChatDB
             conn.Open();
 
             SqlCommand command = new SqlCommand(
-                "UPDATE Pogovor SET besedilo = @besedilo,  time = @time" +
-                "WHERE username=@username",
+                "UPDATE Pogovor SET besedilo=@besedilo, time=@time" +
+                "WHERE id=@id",
                 conn);
-            command.Parameters.AddWithValue("@username", this.Username);
+            command.Parameters.AddWithValue("@id", this.Id);
             command.Parameters.AddWithValue("@besedilo", this.Text);
             command.Parameters.AddWithValue("@time", this.Time);
 
@@ -203,9 +205,9 @@ namespace ChatDB
 
             SqlCommand command = new SqlCommand(
                 "DELETE FROM Pogovor " +
-                "WHERE username=@username",
+                "WHERE id=@id",
                 conn);
-            command.Parameters.AddWithValue("@username", this.Username);
+            command.Parameters.AddWithValue("@id", this.Id);
 
             command.ExecuteNonQuery();
 
