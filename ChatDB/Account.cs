@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Text;
+using System.Runtime.Caching;
 
 namespace ChatDB
 {
@@ -17,10 +18,16 @@ namespace ChatDB
         public string LastName { get; private set; }
         public string Username { get; private set; }
 
+        private static readonly CacheItemPolicy _cachePolicy = new CacheItemPolicy
+        {
+            SlidingExpiration = new TimeSpan(0, 30, 0)
+        };
+
         private string _hashedPassword;
 
         /// <summary>
         /// Creates a new User with given data and returns it.
+        /// Caches returned object.
         /// <exception cref="InvalidUsernameException">Throws InvalidUsernameException if username does not meet the requirements.</exception>
         /// <exception cref="InvalidPasswordException">Throws InvalidPasswordException if password does not meet the requirements.</exception>
         /// <exception cref="UsernameDuplicateException">Throws UsernameDuplicateException if username is already taken.</exception>
@@ -70,10 +77,14 @@ namespace ChatDB
 
         /// <summary>
         /// Finds and returns User with given username.
+        /// Caches returned object.
         /// <exception cref="UsernameNotFoundException">Throws UsernameNotFoundException if username is not found.</exception>
         /// </summary>
         public static Account Get(string username)
         {
+            if (MemoryCache.Default.Contains(username))
+                return (Account)MemoryCache.Default.Get(username);
+
             Account user = null;
 
             SqlConnection conn = new SqlConnection(Database.ConnectionString);
@@ -94,6 +105,8 @@ namespace ChatDB
                         LastName = (string)reader["priimek"],
                         _hashedPassword = (string)reader["geslo"]
                     };
+                    
+                    MemoryCache.Default.Set("user-"+user.Username, user, _cachePolicy);
                 }
             }
 
@@ -107,6 +120,7 @@ namespace ChatDB
 
         /// <summary>
         /// Returns a list of all registered users.
+        /// Caches returned objects.
         /// </summary>
         public static List<Account> GetAll()
         {
@@ -129,6 +143,7 @@ namespace ChatDB
                         _hashedPassword = (string)reader["geslo"]
                     };
 
+                    MemoryCache.Default.Set("user-" + user.Username, user, _cachePolicy);
                     list.Add(user);
                 }
             }
@@ -179,6 +194,8 @@ namespace ChatDB
             command.ExecuteNonQuery();
 
             conn.Close();
+
+            MemoryCache.Default.Set("user-" + Username, this, _cachePolicy);
         }
 
         private void Create()
@@ -198,6 +215,8 @@ namespace ChatDB
             command.ExecuteNonQuery();
 
             conn.Close();
+
+            MemoryCache.Default.Set("user-" + Username, this, _cachePolicy);
         }
 
         private void Delete()
@@ -217,6 +236,8 @@ namespace ChatDB
             command.ExecuteNonQuery();
 
             conn.Close();
+
+            MemoryCache.Default.Remove("user-" + Username);
         }
 
         public class InvalidUsernameException : Exception
