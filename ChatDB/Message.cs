@@ -207,7 +207,7 @@ namespace ChatDB
                 "DELETE FROM Pogovor " +
                 "WHERE id=@id",
                 conn);
-            command.Parameters.AddWithValue("@username", this.Id);
+            command.Parameters.AddWithValue("@id", this.Id);
 
             command.ExecuteNonQuery();
 
