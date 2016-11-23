@@ -10,7 +10,7 @@ namespace ChatDB
 {
     public partial class Chat : Page
     {
-        public List<Message> MessageList { get; } = new List<Message>(); //Message.GetAllWithAuthors();
+        public List<Message> MessageList { get; } = Message.GetAll();
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -21,7 +21,9 @@ namespace ChatDB
         {
             var m = MessageField.Text.Trim();
             if (m.Length > 0)
-                Message.Create(Context.User.Identity.Name, m);
+                MessageList.Add(Message.Create(Context.User.Identity.Name, m));
+
+            MessageField.Text = "";
         }
 
         protected void RefreshButton_Click(object sender, EventArgs e)

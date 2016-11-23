@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" MasterPageFile="~/Master.master" AutoEventWireup="true" CodeBehind="Login.aspx.cs" Inherits="ChatDB.Login" %>
+﻿<%@ Page Language="C#" MasterPageFile="~/Master.master" AutoEventWireup="true" CodeBehind="Login.aspx.cs" Inherits="ChatDB.Login" ValidateRequest="false"%>
 
 <asp:Content ID="Content" ContentPlaceHolderID="Content" Runat="Server">
 

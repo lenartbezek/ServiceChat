@@ -5,6 +5,7 @@
 .message-date {
 	color: gray;
 	font-size: 0.7rem;
+    text-align: right;
 }
 
 .message-list {

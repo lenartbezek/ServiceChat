@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" MasterPageFile="~/Master.master" AutoEventWireup="true" CodeBehind="Chat.aspx.cs" Inherits="ChatDB.Chat" %>
+﻿<%@ Page Language="C#" MasterPageFile="~/Master.master" AutoEventWireup="true" CodeBehind="Chat.aspx.cs" Inherits="ChatDB.Chat" ValidateRequest="false"%>
 
 <asp:Content ID="Content" ContentPlaceHolderID="Content" Runat="Server">
     <script src="js/moment.min.js"></script>
@@ -8,7 +8,19 @@
         $(function () {
             moment.locale("sl-SI");
             var serverTime = moment("<%= DateTime.UtcNow.ToString("o") %>");
-            $(".message-date").each((i, e) => { return $(e).html(moment($(e).data("iso")).from(serverTime)); });
+            var serverOffset = moment(serverTime).diff(moment());
+            
+            function now() {
+                return moment().add('milliseconds', serverOffset);
+            }
+
+            function updateMessageTimes() {
+                $(".message-date").each((i, e) => { return $(e).html(moment($(e).data("iso")).from(now())); });
+            }
+
+            updateMessageTimes();
+            setTimeout(updateMessageTimes, 1000);
+            
             $("#MessageField").focus().addClass("active");
             $(".message-list").scrollTop(999999);
         });
@@ -21,7 +33,7 @@
             <ul>
                 <% foreach (var m in MessageList) { %>
                     <li class="row">
-                        <span class="col s12 m3 message-author"><%= HttpUtility.HtmlEncode(m.Author.DisplayName) %></span>
+                        <span class="col s12 m3 message-author"><%= HttpUtility.HtmlEncode(ChatDB.Account.Get(m.Username).DisplayName) %></span>
                         <span class="col s12 m6 message-text"><%= HttpUtility.HtmlEncode(m.Text) %></span>
                         <span class="col s12 m3 message-date" data-iso="<%= m.Time.ToString("o") %>"></span>
                     </li>
