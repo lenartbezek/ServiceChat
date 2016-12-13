@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.Text;
 using System.Linq;
 using System.Web;
+using System.Runtime.Serialization;
 
 namespace ChatDB
 {
@@ -21,11 +22,16 @@ namespace ChatDB
     /// A class for handling all messages.
     /// Implements full CRUD behaviour.
     /// </summary>
+    [DataContract]
     public class Message
     {
+        [DataMember]
         public int Id { get; private set; }
+        [DataMember]
         public string Text { get; private set; }
+        [DataMember]
         public string Username { get; private set; }
+        [DataMember]
         public DateTime Time { get; private set; }
 
         public static Message Create(string username, string text)

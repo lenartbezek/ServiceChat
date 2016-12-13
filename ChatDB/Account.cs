@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Text;
 using System.Runtime.Caching;
+using System.Runtime.Serialization;
+using System.Web;
+using System.Net.Http.Headers;
 
 namespace ChatDB
 {
@@ -10,12 +13,17 @@ namespace ChatDB
     /// A class for handling all user accounts.
     /// Implements full CRUD behaviour.
     /// </summary>
+    [DataContract]
     public class Account
     {
+        [DataMember]
         public string DisplayName => FirstName.Length > 0 ? FirstName + " " + LastName : Username;
 
+        [DataMember]
         public string FirstName { get; private set; }
+        [DataMember]
         public string LastName { get; private set; }
+        [DataMember]
         public string Username { get; private set; }
 
         private static readonly CacheItemPolicy _cachePolicy = new CacheItemPolicy
@@ -72,6 +80,46 @@ namespace ChatDB
             catch (SqlException)
             {
                 throw new UsernameDuplicateException();
+            }
+        }
+
+        /// <summary>
+        /// Authenticates current user.
+        /// </summary>
+        public static Account Authenticate()
+        {
+            var request = HttpContext.Current.Request;
+            var authHeader = request.Headers["Authorization"];
+            if (authHeader == null) return null;
+
+            var authHeaderVal = AuthenticationHeaderValue.Parse(authHeader);
+            string credentials;
+            // RFC 2617 sec 1.2, "scheme" name is case-insensitive
+            if (authHeaderVal.Scheme.Equals("basic",
+                    StringComparison.OrdinalIgnoreCase) &&
+                    authHeaderVal.Parameter != null)
+                credentials = authHeaderVal.Parameter;
+            else
+                return null;
+
+            try
+            {
+                var encoding = Encoding.GetEncoding("iso-8859-1");
+                credentials = encoding.GetString(Convert.FromBase64String(credentials));
+
+                int separator = credentials.IndexOf(':');
+                string name = credentials.Substring(0, separator);
+                string password = credentials.Substring(separator + 1);
+
+                var account = Get(name);
+                if (account.VerifyPassword(password))
+                    return account;
+                else
+                    return null;
+            }
+            catch
+            {
+                return null;
             }
         }
 
