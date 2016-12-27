@@ -52,8 +52,8 @@ namespace ServiceChat
                 "",
                 "~/Chat.aspx");
             routes.MapPageRoute("Admin",
-                "",
-                "~/Admin.aspx");
+                "admin",
+                "~/AdminPanel.aspx");
             routes.MapHttpRoute(
                 name: "DefaultApi",
                 routeTemplate: "Service1.svc/{controller}/{id}",

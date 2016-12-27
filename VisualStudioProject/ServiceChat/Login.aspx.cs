@@ -78,7 +78,7 @@ namespace ServiceChat
             }
             catch (Account.InvalidPasswordException)
             {
-                RegisterPasswordError = "Geslo more bit ful zajebano z ciframi in klicaji in dvema velkima črkama";
+                RegisterPasswordError = "Geslo more bit ful zajebano z ciframi in klicaji in eno veliko črko";
             }
             catch (Account.UsernameDuplicateException)
             {
@@ -111,7 +111,7 @@ namespace ServiceChat
                         return;
                     }
                     account.CreateSessionCookie();
-                    Response.RedirectToRoute("Default");
+                    Response.RedirectToRoute("Admin");
                 }
                 else
                     PasswordError = "Napačno geslo";

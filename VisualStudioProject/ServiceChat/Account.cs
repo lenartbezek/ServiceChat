@@ -78,7 +78,7 @@ CREATE TABLE [dbo].[Uporabnik] (
                   password.Contains("!") ||
                   password.Contains(":"))||
                 numericCharCount < 2 ||
-                uppercaseCharCount < 2)
+                uppercaseCharCount < 1)
                 throw new InvalidPasswordException();
 
             var newUser = new Account
@@ -191,7 +191,7 @@ CREATE TABLE [dbo].[Uporabnik] (
         /// <summary>
         /// Removes the session cookie for this user. To be called at logout.
         /// </summary>
-        public void RemoveSessionCookie()
+        public static void RemoveSessionCookie()
         {
             HttpContext.Current.Response.Cookies.Remove(FormsAuthentication.FormsCookieName);
         }
@@ -203,8 +203,8 @@ CREATE TABLE [dbo].[Uporabnik] (
         /// </summary>
         public static Account Get(string username)
         {
-            if (MemoryCache.Default.Contains(username))
-                return (Account)MemoryCache.Default.Get(username);
+            if (MemoryCache.Default.Contains("user-" + username))
+                return (Account)MemoryCache.Default.Get("user-" + username);
 
             Account user = null;
 
@@ -335,8 +335,8 @@ CREATE TABLE [dbo].[Uporabnik] (
             conn.Open();
 
             var command = new SqlCommand(
-                "INSERT INTO Uporabnik (username, ime, priimek, geslo, role, admin) "+
-                "VALUES (@username, @firstname, @lastname, @hash, @role, @admin) ",
+                "INSERT INTO Uporabnik (username, ime, priimek, geslo, admin) "+
+                "VALUES (@username, @firstname, @lastname, @hash, @admin) ",
                 conn);
             command.Parameters.AddWithValue("@username", Username);
             command.Parameters.AddWithValue("@firstname", FirstName);

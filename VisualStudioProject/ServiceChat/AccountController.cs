@@ -43,7 +43,7 @@ namespace ServiceChat
             }
             catch (Account.InvalidPasswordException)
             {
-                return BadRequest("Geslo more bit ful zajebano z ciframi in klicaji in dvema velkima črkama");
+                return BadRequest("Geslo more bit ful zajebano z ciframi in klicaji in eno veliko črko");
             }
             catch (Account.UsernameDuplicateException)
             {
