@@ -15,12 +15,10 @@ namespace ServiceChat
         protected string RegisterPasswordRepeatError { get; private set; } = "";
         protected string MissingRoleError { get; private set; } = "";
 
-        private Account _account;
-
         protected void Page_Load(object sender, EventArgs e)
         {
-            _account = Account.Authenticate(Account.AuthenticationType.SessionCookie);
-            if (_account != null)
+            var account = Account.Authenticate(Account.AuthenticationType.SessionCookie);
+            if (account != null)
                 Response.RedirectToRoute("Default");
         }
 

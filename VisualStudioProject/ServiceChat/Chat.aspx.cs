@@ -8,12 +8,12 @@ namespace ServiceChat
     {
         public List<Message> MessageList { get; } = Message.GetAll();
 
-        private Account _account;
+        protected Account Account;
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            _account = Account.Authenticate(Account.AuthenticationType.SessionCookie);
-            if (_account == null)
+            Account = Account.Authenticate(Account.AuthenticationType.SessionCookie);
+            if (Account == null)
                 Response.RedirectToRoute("Login");
         }
 
@@ -33,7 +33,7 @@ namespace ServiceChat
 
         protected void LogoutButton_Click(object sender, EventArgs e)
         {
-            _account.RemoveSessionCookie();
+            Account.RemoveSessionCookie();
             Response.RedirectToRoute("Login");
         }
     }

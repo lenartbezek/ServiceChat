@@ -165,11 +165,11 @@ CREATE TABLE [dbo].[Uporabnik] (
             var authCookie = HttpContext.Current.Request.Cookies[FormsAuthentication.FormsCookieName];
             if (authCookie == null) return null;
 
-            var authTicket = FormsAuthentication.Decrypt(authCookie.Value);
-            if (authTicket == null) return null;
-
             try
             {
+                var authTicket = FormsAuthentication.Decrypt(authCookie.Value);
+                if (authTicket == null) return null;
+
                 var name = new FormsIdentity(authTicket).Name;
                 return Get(name);
             }
@@ -184,18 +184,7 @@ CREATE TABLE [dbo].[Uporabnik] (
         /// </summary>
         public void CreateSessionCookie()
         {
-            var ticket = new FormsAuthenticationTicket(
-                1,                                     // ticket version
-                Username,                              // authenticated username
-                DateTime.Now,                          // issueDate
-                DateTime.Now.AddDays(1),               // expiryDate
-                true,                                  // true to persist across browser sessions
-                null,                                  // can be used to store additional user data
-                FormsAuthentication.FormsCookiePath);  // the path for the cookie
-
-            var encryptedTicket = FormsAuthentication.Encrypt(ticket);
-
-            var cookie = new HttpCookie(FormsAuthentication.FormsCookieName, encryptedTicket) {HttpOnly = true};
+            var cookie = FormsAuthentication.GetAuthCookie(Username, true);
             HttpContext.Current.Response.Cookies.Add(cookie);
         }
 
@@ -370,20 +359,29 @@ CREATE TABLE [dbo].[Uporabnik] (
             var conn = new SqlConnection(Database.ConnectionString);
             conn.Open();
 
-            var deleteUser = new SqlCommand(
-                "DELETE FROM Uporabnik " +
-                "WHERE username=@username",
-                conn);
-            deleteUser.Parameters.AddWithValue("@username", Username);
+            var command = new SqlCommand(
+@"BEGIN TRANSACTION DeleteUser
 
-            var deleteMessages = new SqlCommand(
-                "DELETE FROM Pogovor "+
-                "WHERE username=@username",
-                conn);
-            deleteMessages.Parameters.AddWithValue("@username", Username);
+BEGIN TRY
 
-            deleteUser.ExecuteNonQuery();
-            deleteMessages.ExecuteNonQuery();
+    DELETE FROM Uporabnik
+    WHERE username=@username
+
+    DELETE FROM Pogovor
+    WHERE username=@username
+
+COMMIT TRANSACTION DeleteUser
+
+END TRY
+
+BEGIN CATCH
+    ROLLBACK TRANSACTION DeleteUser
+END CATCH  
+
+GO",
+                conn);
+            command.Parameters.AddWithValue("@username", Username);
+            command.ExecuteNonQuery();
 
             conn.Close();
 

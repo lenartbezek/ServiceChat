@@ -29,9 +29,10 @@
             <div class="center-align">
                 <asp:Button ID="RegisterButton" runat="server" Text="Registracija" 
                     CssClass="waves-effect waves-light btn" 
-                    OnClick="RegisterButton_Click"/>
+                    OnClick="RegisterButton_Click"
+                    type="button"/>
 
-                <h5><%= RegisterSuccessMessage %></h5>
+                <p><%= RegisterSuccessMessage %></p>
             </div>
         </div>
 
@@ -52,15 +53,17 @@
             <div class="center-align">
                 <asp:Button ID="LoginButton" runat="server" Text="Prijava" 
                     CssClass="waves-effect waves-light btn" 
-                    OnClick="LoginButton_Click"/>
+                    OnClick="LoginButton_Click"
+                    type="submit"/>
             </div>
             
             <div class="center-align" style="margin-top: 1rem">
                 <asp:Button ID="AdminLoginButton" runat="server" Text="Prijava kot administrator" 
                     CssClass="waves-effect waves-teal btn-flat grey-text" 
-                    OnClick="AdminLoginButton_Click"/>
+                    OnClick="AdminLoginButton_Click"
+                    type="button"/>
                 <br/>
-                <h5 class="red-text"><%= MissingRoleError %></h5>
+                <p><%= MissingRoleError %></p>
             </div>
             
         </div>

@@ -50,7 +50,7 @@
         <div class="col s12 m3 users-list" id="Users">
             <ul>
                 <% foreach (var account in Account.GetAll()) { %>
-                    <li class="<%= (account.Username == Context.User.Identity.Name) ? "chip blue-grey white-text" : "chip" %>"
+                    <li class="<%= (Account != null && account.Username == Account.Username) ? "chip blue-grey white-text" : "chip" %>"
                     ><%= HttpUtility.HtmlEncode(account.DisplayName) %></li>
                 <% } %>
             </ul>
