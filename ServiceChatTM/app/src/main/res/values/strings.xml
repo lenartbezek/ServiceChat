@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">ServiceChatTM</string>
+    <string name="title_activity_msg">MsgActivity</string>
+</resources>

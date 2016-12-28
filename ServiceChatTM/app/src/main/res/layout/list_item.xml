@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/contItemRoot"
+    android:layout_width="match_parent"
+    android:layout_height="72dp"
+    android:background="@drawable/background_state_drawable"
+    android:clickable="true"
+    >
+
+
+    <ImageView
+        android:id="@+id/iwItemImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:paddingLeft="16dp"
+        android:src="@drawable/ic_sentiment_very_satisfied_black_24dp"
+        />
+
+    <TextView
+        android:id="@+id/twItemText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/iwItemImage"
+        android:layout_marginLeft="72dp"
+        android:layout_marginRight="48dp"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif"
+        android:maxLines="1"
+        android:text="test texttest texttest tet"
+        android:textColor="@android:color/black"
+        android:textSize="16sp"
+        />
+
+    <TextView
+        android:id="@+id/twItemIcon"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/twItemText"
+        android:layout_marginLeft="72dp"
+        android:layout_marginRight="48dp"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif"
+        android:maxLines="1"
+        android:text="t12f"
+        android:textSize="14sp"
+        />
+
+    <ImageView
+        android:id="@+id/iwItemIconSecondary"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:clickable="true"
+        android:padding="16dp"
+        android:src="@drawable/ic_star_border_black_24dp"
+        android:background="@drawable/background_state_drawable"
+        />
+</RelativeLayout>
