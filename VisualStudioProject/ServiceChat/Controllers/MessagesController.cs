@@ -1,16 +1,17 @@
 ﻿using System.Web.Http;
+using ServiceChat.Models;
+using static ServiceChat.Authentication;
 
-namespace ServiceChat
+namespace ServiceChat.App_Code
 {
-    [RoutePrefix("Service1.svc/Messages")]
     public class MessagesController : ApiController
     {
-        // GET Service1.svc/Messages
+        // Returns all messages
         public object Get()
         {
             try
             {
-                var account = Account.Authenticate();
+                var account = Authenticate();
                 if (account == null) return Unauthorized();
 
                 return Ok(Message.GetAll());
@@ -22,19 +23,14 @@ namespace ServiceChat
         }
 
         // Returns messages that arrived after the message at given ID
-        // GET Service1.svc/Messages/5
         public object Get(int id)
         {
             try
             {
-                var account = Account.Authenticate();
+                var account = Authenticate();
                 if (account == null) return Unauthorized();
 
                 return Ok(Message.GetSince(id));
-            }
-            catch (Message.IdNotFoundException)
-            {
-                return NotFound();
             }
             catch
             {

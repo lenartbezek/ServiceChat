@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Net.Http.Headers;
+using System.Linq;
 using System.Runtime.Caching;
 using System.Runtime.Serialization;
 using System.Security.Cryptography;
 using System.Text;
-using System.Web;
-using System.Web.Security;
 
-namespace ServiceChat
+namespace ServiceChat.Models
 {
     /*
 CREATE TABLE [dbo].[Uporabnik] (
@@ -30,18 +28,33 @@ CREATE TABLE [dbo].[Uporabnik] (
     public class Account
     {
         [DataMember]
-        public string DisplayName => FirstName.Length > 0 
-            ? $"{FirstName} {LastName}" 
-            : Username;
+        public string DisplayName
+        {
+            get
+            {
+                return !string.IsNullOrEmpty(FirstName)
+                    ? $"{FirstName} {LastName}"
+                    : Username;
+            }
+            set
+            {
+                if (string.IsNullOrEmpty(value)) return;
+                var list = value.Split(' ').ToList();
+                FirstName = list[0];
+                LastName = list.Count > 1 ? list[1] : "";
+                for (var i = 2; i < list.Count; i++)
+                    LastName += " " + list[i];
+            }
+        }
 
         [DataMember]
-        public string FirstName { get; private set; }
-        [DataMember]
-        public string LastName { get; private set; }
-        [DataMember]
-        public string Username { get; private set; }
+        public string Username { get; }
+
         [DataMember]
         public bool Admin { get; set; }
+
+        public string FirstName { get; private set; }
+        public string LastName { get; private set; }
 
         private static readonly CacheItemPolicy CachePolicy = new CacheItemPolicy
         {
@@ -51,17 +64,14 @@ CREATE TABLE [dbo].[Uporabnik] (
         private string _hashedPassword;
 
         /// <summary>
-        /// Creates a new User with given data and returns it.
-        /// Caches returned object.
-        /// <exception cref="InvalidUsernameException">Throws InvalidUsernameException if username does not meet the requirements.</exception>
-        /// <exception cref="InvalidPasswordException">Throws InvalidPasswordException if password does not meet the requirements.</exception>
-        /// <exception cref="UsernameDuplicateException">Throws UsernameDuplicateException if username is already taken.</exception>
+        /// Verifies password format and sets the password hash.
+        /// Returns false if password format is invalid.
         /// </summary>
-        public static Account Create(string firstname, string lastname, string username, string password)
+        /// <param name="password">New password.</param>
+        /// <returns>Is successful.</returns>
+        public bool SetPassword(string password)
         {
-            if (username.Length < 4 ||
-                Encoding.UTF8.GetByteCount(username) != username.Length)
-                throw new InvalidUsernameException();
+            if (password == null) return false;
 
             var numericCharCount = 0;
             var uppercaseCharCount = 0;
@@ -76,130 +86,59 @@ CREATE TABLE [dbo].[Uporabnik] (
                   password.Contains(".") ||
                   password.Contains("*") ||
                   password.Contains("!") ||
-                  password.Contains(":"))||
+                  password.Contains(":")) ||
                 numericCharCount < 2 ||
                 uppercaseCharCount < 1)
-                throw new InvalidPasswordException();
+                return false;
 
-            var newUser = new Account
-            {
-                FirstName = firstname,
-                LastName = lastname,
-                Username = username,
-                _hashedPassword = Hash(password)
-            };
-
-            try
-            {
-                newUser.Create();
-                return newUser;
-            }
-            catch (SqlException)
-            {
-                throw new UsernameDuplicateException();
-            }
-        }
-
-        public enum AuthenticationType
-        {
-            Any = 0,
-            BasicHttp = 1,
-            SessionCookie = 2
+            _hashedPassword = Hash(password);
+            return true;
         }
 
         /// <summary>
-        /// Authenticates current user.
-        /// Returns Account if successful and null otherwise.
+        /// Verifies the password against the stored hash.
+        /// Returns true if valid.
         /// </summary>
-        public static Account Authenticate(AuthenticationType type = AuthenticationType.Any)
+        public bool VerifyPassword(string password)
         {
-            switch (type)
-            {
-                case AuthenticationType.Any:
-                    return AuthenticateBasicHttp() ?? AuthenticateSessionCookie();
-                case AuthenticationType.BasicHttp:
-                    return AuthenticateBasicHttp();
-                case AuthenticationType.SessionCookie:
-                    return AuthenticateSessionCookie();
-                default:
-                    return null;
-            }
-        }
-
-        private static Account AuthenticateBasicHttp()
-        {
-            var request = HttpContext.Current.Request;
-            var authHeader = request.Headers["Authorization"];
-            if (authHeader == null) return null;
-
-            var authHeaderVal = AuthenticationHeaderValue.Parse(authHeader);
-            string credentials;
-            // RFC 2617 sec 1.2, "scheme" name is case-insensitive
-            if (authHeaderVal.Scheme.Equals("basic",
-                    StringComparison.OrdinalIgnoreCase) &&
-                    authHeaderVal.Parameter != null)
-                credentials = authHeaderVal.Parameter;
-            else
-                return null;
-
-            try
-            {
-                var encoding = Encoding.GetEncoding("iso-8859-1");
-                credentials = encoding.GetString(Convert.FromBase64String(credentials));
-
-                var separator = credentials.IndexOf(':');
-                var name = credentials.Substring(0, separator);
-                var password = credentials.Substring(separator + 1);
-
-                var account = Get(name);
-                return account.VerifyPassword(password) ? account : null;
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        private static Account AuthenticateSessionCookie()
-        {
-            var authCookie = HttpContext.Current.Request.Cookies[FormsAuthentication.FormsCookieName];
-            if (authCookie == null) return null;
-
-            try
-            {
-                var authTicket = FormsAuthentication.Decrypt(authCookie.Value);
-                if (authTicket == null) return null;
-
-                var name = new FormsIdentity(authTicket).Name;
-                return Get(name);
-            }
-            catch
-            {
-                return null;
-            }
+            return _hashedPassword == Hash(password);
         }
 
         /// <summary>
-        /// Creates a session cookie for this user. To be called at login.
+        /// Creates new account with given username.
+        /// Intended for user registration.
+        /// Does not cache it or save it to database.
+        /// To save it to the database, call `account.Create()`.
+        /// <exception cref="InvalidUsernameException"></exception>
+        /// /// <exception cref="InvalidPasswordException"></exception>
         /// </summary>
-        public void CreateSessionCookie()
+        public Account(string username, string password, string displayName=null)
         {
-            var cookie = FormsAuthentication.GetAuthCookie(Username, true);
-            HttpContext.Current.Response.Cookies.Add(cookie);
+            if (username.Length < 4 ||
+                Encoding.UTF8.GetByteCount(username) != username.Length)
+                throw new InvalidUsernameException();
+
+            Username = username;
+            DisplayName = displayName;
+
+            var validPassword = SetPassword(password);
+
+            if (!validPassword) throw new InvalidPasswordException();
         }
 
         /// <summary>
-        /// Removes the session cookie for this user. To be called at logout.
+        /// Private constructor for Account type.
+        /// Intended for loading user accounts from the database.
         /// </summary>
-        public static void RemoveSessionCookie()
+        /// <param name="username"></param>
+        private Account(string username)
         {
-            HttpContext.Current.Response.Cookies.Remove(FormsAuthentication.FormsCookieName);
+            Username = username;
         }
 
         /// <summary>
         /// Finds and returns User with given username.
         /// Caches returned object.
-        /// <exception cref="UsernameNotFoundException">Throws UsernameNotFoundException if username is not found.</exception>
         /// </summary>
         public static Account Get(string username)
         {
@@ -219,9 +158,8 @@ CREATE TABLE [dbo].[Uporabnik] (
             {
                 if (reader.Read())
                 {
-                    user = new Account
+                    user = new Account((string)reader["username"])
                     {
-                        Username = (string)reader["username"],
                         FirstName = (string)reader["ime"],
                         LastName = (string)reader["priimek"],
                         Admin = (bool)reader["admin"],
@@ -233,9 +171,6 @@ CREATE TABLE [dbo].[Uporabnik] (
             }
 
             conn.Close();
-
-            if (user == null)
-                throw new UsernameNotFoundException();
 
             return user;
         }
@@ -257,9 +192,8 @@ CREATE TABLE [dbo].[Uporabnik] (
             {
                 while (reader.Read())
                 {
-                    var user = new Account
+                    var user = new Account((string)reader["username"])
                     {
-                        Username = (string)reader["username"],
                         FirstName = (string)reader["ime"],
                         LastName = (string)reader["priimek"],
                         Admin = (bool)reader["admin"],
@@ -289,15 +223,6 @@ CREATE TABLE [dbo].[Uporabnik] (
                 sb.Append(b.ToString("X2"));
 
             return sb.ToString();
-        }
-       
-        /// <summary>
-        /// Verifies the password against the stored hash.
-        /// Returns true if valid.
-        /// </summary>
-        public bool VerifyPassword(string password)
-        {
-            return _hashedPassword == Hash(password);
         }
 
         /// <summary>
@@ -331,6 +256,9 @@ CREATE TABLE [dbo].[Uporabnik] (
         /// </summary>
         public void Create()
         {
+            if (_hashedPassword == null)
+                throw new InvalidOperationException("Account cannot be saved with no password set.");
+
             var conn = new SqlConnection(Database.ConnectionString);
             conn.Open();
 

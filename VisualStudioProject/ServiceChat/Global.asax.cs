@@ -25,7 +25,7 @@ namespace ServiceChat
 
         protected void Application_AuthenticateRequest(object sender, EventArgs e)
         {
-            
+
         }
 
         protected void Application_Error(object sender, EventArgs e)
@@ -45,15 +45,6 @@ namespace ServiceChat
 
         private static void RegisterRoutes(RouteCollection routes)
         {
-            routes.MapPageRoute("Login",
-                "login",
-                "~/Login.aspx");
-            routes.MapPageRoute("Default",
-                "",
-                "~/Chat.aspx");
-            routes.MapPageRoute("Admin",
-                "admin",
-                "~/AdminPanel.aspx");
             routes.MapHttpRoute(
                 name: "DefaultApi",
                 routeTemplate: "Service1.svc/{controller}/{id}",

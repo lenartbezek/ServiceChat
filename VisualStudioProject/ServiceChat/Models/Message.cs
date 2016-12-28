@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Runtime.Serialization;
 
-namespace ServiceChat
+namespace ServiceChat.Models
 {
     /*
 CREATE TABLE [dbo].[Pogovor] (
@@ -29,24 +29,35 @@ CREATE TABLE [dbo].[Pogovor] (
         public string Username { get; private set; }
         [DataMember]
         public DateTime Time { get; private set; }
+        [DataMember]
+        public DateTime Edited { get; private set; }
 
-        public static Message Create(string username, string text)
+        public Message(Account account, string text)
         {
-            var newMessage = new Message
-            {
-                Username = username,
-                Text = text,
-                Time = DateTime.UtcNow
-            };
+            Username = account.Username;
+            Text = text;
+            Time = DateTime.UtcNow;
+        }
 
-            newMessage.Create();
-            return newMessage;
-
+        private Message(int id)
+        {
+            Id = id;
         }
 
         /// <summary>
-        /// Finds and returns Message with given id.
-        /// <exception cref="IdNotFoundException">Throws IdNotFoundException if id is not found.</exception>
+        /// Edits text and sets edited mark.
+        /// Requries a call to Update() to save changes.
+        /// </summary>
+        /// <param name="newText">New text to be saved.</param>
+        public void Edit(string newText)
+        {
+            Text = newText;
+            Edited = DateTime.UtcNow;
+        }
+
+        /// <summary>
+        /// Finds and returns Message with given ID.
+        /// Returns null if not found.
         /// </summary>
         public static Message Get(int id)
         {
@@ -67,20 +78,17 @@ CREATE TABLE [dbo].[Pogovor] (
             {
                 if (reader.Read())
                 {
-                    message = new Message
+                    message = new Message(id)
                     {
-                        Id = id,
                         Username = (string)reader["username"],
                         Text = (string)reader["besedilo"],
-                        Time = ((DateTime)reader["time"]).ToUniversalTime()
+                        Time = ((DateTime)reader["time"]).ToUniversalTime(),
+                        Edited = ((DateTime)reader["time"]).ToUniversalTime(),
                     };
                 }
             }
 
             conn.Close();
-
-            if (message == null)
-                throw new IdNotFoundException();
 
             return message;
         }
@@ -105,12 +113,12 @@ CREATE TABLE [dbo].[Pogovor] (
             {
                 while (reader.Read())
                 {
-                    var message = new Message
+                    var message = new Message((int)reader["id"])
                     {
-                        Id = (int)reader["id"],
                         Username = (string)reader["username"],
                         Text = (string)reader["besedilo"],
-                        Time = ((DateTime)reader["time"]).ToLocalTime()
+                        Time = ((DateTime)reader["time"]).ToUniversalTime(),
+                        Edited = ((DateTime)reader["time"]).ToUniversalTime()
                     };
 
                     list.Add(message);
@@ -150,12 +158,12 @@ CREATE TABLE [dbo].[Pogovor] (
             {
                 while (reader.Read())
                 {
-                    var message = new Message
+                    var message = new Message((int)reader["id"])
                     {
-                        Id = (int)reader["id"],
                         Username = (string)reader["username"],
                         Text = (string)reader["besedilo"],
-                        Time = ((DateTime)reader["time"]).ToLocalTime()
+                        Time = ((DateTime)reader["time"]).ToUniversalTime(),
+                        Edited = ((DateTime)reader["time"]).ToUniversalTime()
                     };
 
                     list.Add(message);
@@ -190,12 +198,12 @@ CREATE TABLE [dbo].[Pogovor] (
             {
                 while (reader.Read())
                 {
-                    var message = new Message
+                    var message = new Message((int)reader["id"])
                     {
-                        Id = (int)reader["id"],
                         Username = (string)reader["username"],
                         Text = (string)reader["besedilo"],
-                        Time = ((DateTime)reader["time"]).ToLocalTime()
+                        Time = ((DateTime)reader["time"]).ToUniversalTime(),
+                        Edited = ((DateTime)reader["time"]).ToUniversalTime()
                     };
 
                     list.Add(message);
@@ -207,8 +215,16 @@ CREATE TABLE [dbo].[Pogovor] (
             return list;
         }
 
-        private void Create()
+        /// <summary>
+        /// Creates a new row for the message in the database.
+        /// Assigns the Id to the message.
+        /// </summary>
+        public void Create()
         {
+            if (string.IsNullOrEmpty(Username) ||
+                string.IsNullOrEmpty(Text))
+                throw new InvalidOperationException("Cannot save a message with no text or user.");
+
             var conn = new SqlConnection(Database.ConnectionString);
             conn.Open();
 
@@ -227,13 +243,16 @@ CREATE TABLE [dbo].[Pogovor] (
             conn.Close();
         }
 
-        private void Update()
+        /// <summary>
+        /// Updates the text of this message.
+        /// </summary>
+        public void Update()
         {
             var conn = new SqlConnection(Database.ConnectionString);
             conn.Open();
 
             var command = new SqlCommand(
-                "UPDATE Pogovor SET besedilo=@besedilo, time=@time" +
+                "UPDATE Pogovor SET besedilo=@besedilo, edited=@time" +
                 "WHERE id=@id",
                 conn);
             command.Parameters.AddWithValue("@id", Id);
@@ -245,7 +264,7 @@ CREATE TABLE [dbo].[Pogovor] (
             conn.Close();
         }
 
-        private void Delete()
+        public void Delete()
         {
             var conn = new SqlConnection(Database.ConnectionString);
             conn.Open();
@@ -259,10 +278,6 @@ CREATE TABLE [dbo].[Pogovor] (
             command.ExecuteNonQuery();
 
             conn.Close();
-        }
-        public class IdNotFoundException : Exception
-        {
-            public override string Message => "Message with this id doesn't exist.";
         }
     }
 }
