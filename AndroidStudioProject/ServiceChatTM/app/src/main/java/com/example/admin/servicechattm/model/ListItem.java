@@ -6,16 +6,16 @@ package com.example.admin.servicechattm.model;
 
 public class ListItem {
     private int imageResId;
-    private String subTitle;
-    private String title;
+    private String messageAuthor;
+    private String message;
     private boolean favourite = false;
 
     public String getSubTitle() {
-        return subTitle;
+        return messageAuthor;
     }
 
     public void setSubTitle(String subTitle) {
-        this.subTitle = subTitle;
+        this.messageAuthor = subTitle;
     }
 
     public boolean isFavourite() {
@@ -35,10 +35,10 @@ public class ListItem {
     }
 
     public String getTitle() {
-        return title;
+        return message;
     }
 
     public void setTitle(String title) {
-        this.title = title;
+        this.message = title;
     }
 }

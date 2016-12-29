@@ -10,9 +10,9 @@ import java.util.List;
  */
 
 public class DummyData {
-    private static final String[] titles = {"testni msg 1", "testni msg 2", "testni msg 3", "testni msg 4"
+    private static final String[] messages = {"testni msg 1", "testni msg 2", "testni msg 3", "testni msg 4"
     };
-    private static final String[] subTitles = {"testni avtor 1", "testni avtor 2", "testni avtor 3", "testni avtor 4"
+    private static final String[] messageAuthors = {"testni avtor 1", "testni avtor 2", "testni avtor 3", "testni avtor 4"
 
     };
     private static final int icon = R.drawable.ic_sentiment_very_satisfied_black_24dp;
@@ -20,10 +20,10 @@ public class DummyData {
     public static List<ListItem> getListData() {
         List<ListItem> data = new ArrayList<>();
         for (int x = 0; x < 4; x++) {
-            for (int i = 0; i < titles.length; i++) {
+            for (int i = 0; i < messages.length; i++) {
                 ListItem item = new ListItem();
-                item.setTitle(titles[i]);
-                item.setSubTitle(subTitles[i]);
+                item.setTitle(messages[i]);
+                item.setSubTitle(messageAuthors[i]);
                 data.add(item);
             }
         }
