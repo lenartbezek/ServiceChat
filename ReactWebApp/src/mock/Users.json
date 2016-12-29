@@ -1,0 +1,17 @@
+[
+    {
+        "Username": "lench",
+        "DisplayName" : "Lenart Bezek",
+        "Admin": false
+    },
+    {
+        "Username": "slavoj",
+        "DisplayName" : "Slavoj Žužek",
+        "Admin": false
+    },
+    {
+        "Username": "admin",
+        "DisplayName" : "Admin Adminus",
+        "Admin": true
+    }
+]
