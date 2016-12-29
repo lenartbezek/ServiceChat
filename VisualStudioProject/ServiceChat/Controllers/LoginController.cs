@@ -55,7 +55,8 @@ namespace ServiceChat.Controllers
         {
             try
             {
-                if (data.Username == null ||
+                if (data == null ||
+                    data.Username == null ||
                     data.Password == null)
                     return BadRequest();
 

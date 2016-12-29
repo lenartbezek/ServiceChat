@@ -2,7 +2,6 @@
 using System.Net.Http.Headers;
 using System.Text;
 using System.Web;
-using System.Web.Security;
 using ServiceChat.Models;
 
 namespace ServiceChat
@@ -79,16 +78,12 @@ namespace ServiceChat
         /// <returns>Authenticated account if successful and null otherwise.</returns>
         public static Account AuthenticateCookie()
         {
-            var authCookie = HttpContext.Current.Request.Cookies[FormsAuthentication.FormsCookieName];
-            if (authCookie == null || authCookie.Expires > DateTime.Now) return null;
-
             try
             {
-                var authTicket = FormsAuthentication.Decrypt(authCookie.Value);
-                if (authTicket == null) return null;
-
-                var name = new FormsIdentity(authTicket).Name;
-                return Account.Get(name);
+                var name = HttpContext.Current.Session["Username"] as string;
+                return string.IsNullOrEmpty(name) 
+                    ? null 
+                    : Account.Get(name);
             }
             catch
             {
@@ -101,8 +96,7 @@ namespace ServiceChat
         /// </summary>
         public static void CreateAuthCookie(Account account)
         {
-            var cookie = FormsAuthentication.GetAuthCookie(account.Username, true);
-            HttpContext.Current.Response.Cookies.Add(cookie);
+            HttpContext.Current.Session["Username"] = account.Username;
         }
 
         /// <summary>
@@ -110,9 +104,7 @@ namespace ServiceChat
         /// </summary>
         public static void ExpireAuthCookie()
         {
-            var cookie = HttpContext.Current.Request.Cookies[FormsAuthentication.FormsCookieName];
-            if (cookie != null)
-                cookie.Expires = DateTime.Now.AddDays(-10);
+            HttpContext.Current.Session["Username"] = "";
         }
 
     }

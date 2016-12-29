@@ -88,7 +88,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
-    <None Include="Properties\PublishProfiles\ChatDB - Web Deploy.pubxml" />
     <None Include="Properties\PublishProfiles\IS-ServiceChat - Web Deploy.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>

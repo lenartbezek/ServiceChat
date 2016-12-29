@@ -27,7 +27,8 @@ namespace ServiceChat.Controllers
         // Register new user
         public object Post([FromBody]dynamic data)
         {
-            if (data.Username == null ||
+            if (data == null ||
+                data.Username == null ||
                 data.Password == null)
                 return BadRequest();
 

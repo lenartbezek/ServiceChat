@@ -27,6 +27,10 @@ namespace ServiceChat.Controllers
         [Route("/{username}")]
         public object Put(string username, [FromBody]dynamic data)
         {
+            if (data == null ||
+                data.DisplayName == null)
+                return BadRequest();
+
             try
             {
                 var account = Authenticate();
