@@ -7,11 +7,13 @@ namespace ServiceChat.Models
 {
     /*
 CREATE TABLE [dbo].[Pogovor] (
-    [id]       INT IDENTITY(1, 1) NOT NULL,
-    [username] VARCHAR (50)       NOT NULL,
-    [besedilo] TEXT               NOT NULL,
-    [time] DATETIME               NOT NULL,
-    PRIMARY KEY CLUSTERED ([id] ASC));
+    [id]       INT          IDENTITY (1, 1) NOT NULL,
+    [username] VARCHAR (50) NOT NULL,
+    [besedilo] TEXT         NULL,
+    [time]     DATETIME     NOT NULL,
+    [edit]     DATETIME NULL, 
+    PRIMARY KEY CLUSTERED ([id] ASC)
+);
      */
 
     /// <summary>

@@ -4,8 +4,10 @@ using static ServiceChat.Authentication;
 
 namespace ServiceChat.Controllers
 {
+    [RoutePrefix("api/account")]
     public class AccountController : ApiController
     {
+
         // Get logged in user data
         public object Get()
         {
@@ -25,9 +27,13 @@ namespace ServiceChat.Controllers
         // Register new user
         public object Post([FromBody]dynamic data)
         {
+            if (data.Username == null ||
+                data.Password == null)
+                return BadRequest();
+
             try
             {
-                var newAccount = new Account(data.Username, data.Password, data.DisplayName);
+                var newAccount = new Account((string)data.Username, (string)data.Password, (string)data.DisplayName);
                 newAccount.Create();
                 return Ok(newAccount);
             }

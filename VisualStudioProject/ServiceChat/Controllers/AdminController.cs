@@ -4,15 +4,16 @@ using static ServiceChat.Authentication;
 
 namespace ServiceChat.Controllers
 {
+    [RoutePrefix("api/admin")]
     public class AdminController : ApiController
     {
         // Get all accounts
-        public object Get(string username)
+        public object Get()
         {
             try
             {
                 var account = Authenticate();
-                if (account == null | !account.Admin) return Unauthorized();
+                if (account == null || !account.Admin) return Unauthorized();
 
                 return Ok(Account.GetAll());
             }
@@ -23,6 +24,7 @@ namespace ServiceChat.Controllers
         }
 
         // Edit user
+        [Route("/{username}")]
         public object Put(string username, [FromBody]dynamic data)
         {
             try
@@ -51,6 +53,7 @@ namespace ServiceChat.Controllers
         }
 
         // Delete user
+        [Route("/{username}")]
         public object Delete(string username)
         {
             try

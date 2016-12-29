@@ -35,7 +35,11 @@ namespace ServiceChat
             }
         }
 
-        private static Account AuthenticateBasicHttp()
+        /// <summary>
+        /// Authenticates using BasicHttp authentication from request headers.
+        /// </summary>
+        /// <returns>Authenticated account if successful and null otherwise.</returns>
+        public static Account AuthenticateBasicHttp()
         {
             var request = HttpContext.Current.Request;
             var authHeader = request.Headers["Authorization"];
@@ -69,7 +73,11 @@ namespace ServiceChat
             }
         }
 
-        private static Account AuthenticateCookie()
+        /// <summary>
+        /// Authenticates using cookie, stored by CreateAuthCookie call.
+        /// </summary>
+        /// <returns>Authenticated account if successful and null otherwise.</returns>
+        public static Account AuthenticateCookie()
         {
             var authCookie = HttpContext.Current.Request.Cookies[FormsAuthentication.FormsCookieName];
             if (authCookie == null || authCookie.Expires > DateTime.Now) return null;

@@ -47,7 +47,7 @@ namespace ServiceChat
         {
             routes.MapHttpRoute(
                 name: "DefaultApi",
-                routeTemplate: "Service1.svc/{controller}/{id}",
+                routeTemplate: "api/{controller}/{id}",
                 defaults: new { id = RouteParameter.Optional });
         }
     }
