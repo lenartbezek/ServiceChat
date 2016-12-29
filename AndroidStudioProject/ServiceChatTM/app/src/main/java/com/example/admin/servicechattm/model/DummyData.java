@@ -6,28 +6,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Admin on 28.12.2016.
+ * Neki testni podatki, naj bi simulirali nekaj kar bi nek servis vrgu vn v jsonu
  */
 
 public class DummyData {
+    private static final String[] titles = {"testni msg 1", "testni msg 2", "testni msg 3", "testni msg 4"
+    };
+    private static final String[] subTitles = {"testni avtor 1", "testni avtor 2", "testni avtor 3", "testni avtor 4"
 
-    private static final String[] titles = {"test 1", "test 2", "test 3"};
-    private static final String[] names = {"name1", "name2", "name3"};
+    };
     private static final int icon = R.drawable.ic_sentiment_very_satisfied_black_24dp;
-    private static final int[] icons = {android.R.drawable.ic_popup_reminder, android.R.drawable.ic_menu_add, android.R.drawable.ic_menu_delete};
 
-    public static List<ListItem> getListData(){
-
+    public static List<ListItem> getListData() {
         List<ListItem> data = new ArrayList<>();
-        for(int i =0; i<5; i++)
-            for(int j=0; j < titles.length; j++){
+        for (int x = 0; x < 4; x++) {
+            for (int i = 0; i < titles.length; i++) {
                 ListItem item = new ListItem();
-                item.setTitle(titles[j]);
-                item.setName(names[j]);
-
-
+                item.setTitle(titles[i]);
+                item.setSubTitle(subTitles[i]);
                 data.add(item);
             }
+        }
         return data;
     }
 }

@@ -4,6 +4,7 @@
     android:id="@+id/activity_msg"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/appBG"
     tools:context="com.example.admin.servicechattm.ui.MessageActivity">
 
     <android.support.v7.widget.RecyclerView
@@ -22,33 +23,36 @@
         android:id="@+id/bRefresh"
         android:layout_alignTop="@+id/bSend"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentEnd="true"
+        android:background="@color/loginButtonColor"
+        />
 
     <Button
         android:text="Send"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/bSend"
-        android:layout_alignTop="@+id/editText"
+        android:layout_alignTop="@+id/etSendMessage"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_marginTop="41dp"
         android:layout_toLeftOf="@+id/bRefresh"
-        android:layout_toStartOf="@+id/bRefresh" />
+        android:layout_toStartOf="@+id/bRefresh"
+        android:background="@color/loginButtonColor"
+        />
 
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:inputType="textPersonName"
         android:ems="10"
-        android:id="@+id/editText"
+        android:id="@+id/etSendMessage"
         android:layout_marginBottom="41dp"
         android:hint="Input message"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
-
+        android:layout_alignParentStart="true"
+        />
 </RelativeLayout>

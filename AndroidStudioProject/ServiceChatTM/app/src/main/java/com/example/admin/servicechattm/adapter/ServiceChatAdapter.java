@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Admin on 28.12.2016.
+ * Adapter za recycler view
  */
 
 public class ServiceChatAdapter extends RecyclerView.Adapter<ServiceChatAdapter.Holder>{
@@ -25,25 +25,27 @@ public class ServiceChatAdapter extends RecyclerView.Adapter<ServiceChatAdapter.
 
     private ItemClickCallback itemClickCallback;
 
-    public interface ItemClickCallback{
-
+    public interface ItemClickCallback {
         void onItemClick(int p);
         void onSecondaryIconClick(int p);
     }
 
-    public void setItemClickCallback(final ItemClickCallback itemClickCallback){
-
+    public void setItemClickCallback(final ItemClickCallback itemClickCallback) {
         this.itemClickCallback = itemClickCallback;
     }
 
     public ServiceChatAdapter(List<ListItem> listData, Context c){
-
-        this.inflater = LayoutInflater.from(c);
+        inflater = LayoutInflater.from(c);
         this.listData = listData;
     }
 
+    public void setListData(ArrayList<ListItem> exerciseList) {
+        this.listData.clear();
+        this.listData.addAll(exerciseList);
+    }
+
     @Override
-    public Holder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ServiceChatAdapter.Holder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = inflater.inflate(R.layout.list_item, parent, false);
         return new Holder(view);
     }
@@ -52,17 +54,12 @@ public class ServiceChatAdapter extends RecyclerView.Adapter<ServiceChatAdapter.
     public void onBindViewHolder(Holder holder, int position) {
         ListItem item = listData.get(position);
         holder.title.setText(item.getTitle());
-        holder.name.setText(item.getName());
-        if(item.isFavorite()){
+        holder.subTitle.setText(item.getSubTitle());
+        if (item.isFavourite()){
             holder.secondaryIcon.setImageResource(R.drawable.ic_star_black_24dp);
-        }else{
+        } else {
             holder.secondaryIcon.setImageResource(R.drawable.ic_star_border_black_24dp);
         }
-    }
-
-    public void setListData(ArrayList<ListItem> nekiList){
-        this.listData.clear();
-        this.listData.addAll(nekiList);
     }
 
     @Override
@@ -72,32 +69,30 @@ public class ServiceChatAdapter extends RecyclerView.Adapter<ServiceChatAdapter.
 
     class Holder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
-        private TextView title;
-        private TextView name;
-        private ImageView thumbnail;
-        private ImageView secondaryIcon;
-        private View container;
+        ImageView thumbnail;
+        ImageView secondaryIcon;
+        TextView title;
+        TextView subTitle;
+        View container;
 
         public Holder(View itemView) {
             super(itemView);
-
-            title = (TextView)itemView.findViewById(R.id.twItemTextMessage);
-            name = (TextView)itemView.findViewById(R.id.twItemTextMessageAuthor);
-            thumbnail = (ImageView)itemView.findViewById(R.id.iwItemImage);
-            secondaryIcon = (ImageView)itemView.findViewById(R.id.iwItemIconSecondary);
+            thumbnail = (ImageView)itemView.findViewById(R.id.iwAuthorIcon);
+            secondaryIcon = (ImageView)itemView.findViewById(R.id.iwSecondaryIcon);
             secondaryIcon.setOnClickListener(this);
-            container = itemView.findViewById(R.id.contItemRoot);
+            subTitle = (TextView)itemView.findViewById(R.id.twAuthorName);
+            title = (TextView)itemView.findViewById(R.id.twMessage);
+            container = (View)itemView.findViewById(R.id.cont_item_root);
             container.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
-            if(v.getId() == R.id.contItemRoot){
+            if (v.getId() == R.id.cont_item_root){
                 itemClickCallback.onItemClick(getAdapterPosition());
-            }else{
+            } else {
                 itemClickCallback.onSecondaryIconClick(getAdapterPosition());
             }
         }
     }
-
 }

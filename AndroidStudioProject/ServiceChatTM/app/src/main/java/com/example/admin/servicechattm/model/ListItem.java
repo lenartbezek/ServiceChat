@@ -1,38 +1,29 @@
 package com.example.admin.servicechattm.model;
 
 /**
- * Created by Admin on 28.12.2016.
+ * Definira en element v recycler view-u
  */
 
 public class ListItem {
-
-    private String title;
     private int imageResId;
-    private String name;
-    private boolean favorite = false;
+    private String subTitle;
+    private String title;
+    private boolean favourite = false;
 
-    public String getName() {
-        return name;
+    public String getSubTitle() {
+        return subTitle;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setSubTitle(String subTitle) {
+        this.subTitle = subTitle;
     }
 
-    public boolean isFavorite() {
-        return favorite;
+    public boolean isFavourite() {
+        return favourite;
     }
 
-    public void setFavorite(boolean favorite) {
-        this.favorite = favorite;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
+    public void setFavourite(boolean favourite) {
+        this.favourite = favourite;
     }
 
     public int getImageResId() {
@@ -41,5 +32,13 @@ public class ListItem {
 
     public void setImageResId(int imageResId) {
         this.imageResId = imageResId;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 }

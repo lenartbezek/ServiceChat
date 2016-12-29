@@ -1,53 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/contItemRoot"
+    android:id="@+id/cont_item_root"
     android:layout_width="match_parent"
     android:layout_height="72dp"
     android:background="@drawable/background_state_drawable"
     android:clickable="true"
     >
 
-
     <ImageView
-        android:id="@+id/iwItemImage"
+        android:id="@+id/iwAuthorIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:paddingLeft="16dp"
-        android:src="@drawable/ic_sentiment_very_satisfied_black_24dp"
-        />
+        android:src="@drawable/ic_sentiment_very_satisfied_black_24dp" />
 
     <TextView
-        android:id="@+id/twItemText"
+        android:id="@+id/twMessage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/iwItemImage"
+        android:layout_alignTop="@+id/iwAuthorIcon"
         android:layout_marginLeft="72dp"
         android:layout_marginRight="48dp"
         android:ellipsize="end"
         android:fontFamily="sans-serif"
-        android:maxLines="1"
-        android:text="test texttest texttest tet"
+        android:text="testni msg 123 123"
         android:textColor="@android:color/black"
         android:textSize="16sp"
-        />
+        android:maxLines="1" />
 
     <TextView
-        android:id="@+id/twItemIcon"
+        android:id="@+id/twAuthorName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/twItemText"
+        android:layout_below="@+id/twMessage"
         android:layout_marginLeft="72dp"
         android:layout_marginRight="48dp"
         android:ellipsize="end"
         android:fontFamily="sans-serif"
-        android:maxLines="1"
-        android:text="t12f"
+        android:text="avtor 123"
         android:textSize="14sp"
-        />
+        android:maxLines="1" />
 
     <ImageView
-        android:id="@+id/iwItemIconSecondary"
+        android:id="@+id/iwSecondaryIcon"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_alignParentRight="true"

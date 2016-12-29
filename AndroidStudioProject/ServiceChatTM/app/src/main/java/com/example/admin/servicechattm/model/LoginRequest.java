@@ -8,11 +8,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by Admin on 28.12.2016.
+ * Naredi z nek request z username in pw ki ga pošlješ na nek url
  */
 
 public class LoginRequest extends StringRequest{
-    //naredi volley request za nek servis
     private static final String LOGIN_REQUEST_URL = "nevem ksn je link od servisa";
     private Map<String, String> params;
 
