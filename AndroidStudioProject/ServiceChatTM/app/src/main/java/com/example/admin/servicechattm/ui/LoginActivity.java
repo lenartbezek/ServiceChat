@@ -61,7 +61,7 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 };
 
-                //naredimo request in ga zapakiramo v hashmap
+                //naredimo request 
                 LoginRequest loginRequest = new LoginRequest(username, password, responseListener);
                 //naredimo volley queue in request vrzemo v volley queue
                 RequestQueue queue = Volley.newRequestQueue(LoginActivity.this);
