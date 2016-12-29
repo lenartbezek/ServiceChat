@@ -238,8 +238,8 @@ CREATE TABLE [dbo].[Uporabnik] (
                 "WHERE username=@username",
                 conn);
             command.Parameters.AddWithValue("@username", Username);
-            command.Parameters.AddWithValue("@firstname", FirstName);
-            command.Parameters.AddWithValue("@lastname", LastName);
+            command.Parameters.AddWithValue("@firstname", FirstName ?? "");
+            command.Parameters.AddWithValue("@lastname", LastName ?? "");
             command.Parameters.AddWithValue("@admin", Admin);
             command.Parameters.AddWithValue("@hash", _hashedPassword);
 
@@ -267,12 +267,19 @@ CREATE TABLE [dbo].[Uporabnik] (
                 "VALUES (@username, @firstname, @lastname, @hash, @admin) ",
                 conn);
             command.Parameters.AddWithValue("@username", Username);
-            command.Parameters.AddWithValue("@firstname", FirstName);
-            command.Parameters.AddWithValue("@lastname", LastName);
+            command.Parameters.AddWithValue("@firstname", FirstName ?? "");
+            command.Parameters.AddWithValue("@lastname", LastName ?? "");
             command.Parameters.AddWithValue("@admin", Admin);
             command.Parameters.AddWithValue("@hash", _hashedPassword);
 
-            command.ExecuteNonQuery();
+            try
+            {
+                command.ExecuteNonQuery();
+            }
+            catch (SqlException)
+            {
+                throw new UsernameDuplicateException();
+            }
 
             conn.Close();
 

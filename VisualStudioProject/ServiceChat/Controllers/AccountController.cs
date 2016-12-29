@@ -34,7 +34,7 @@ namespace ServiceChat.Controllers
 
             try
             {
-                var newAccount = new Account((string)data.Username, (string)data.Password, (string)data.DisplayName);
+                var newAccount = new Account((string) data.Username, (string) data.Password, (string) data.DisplayName);
                 newAccount.Create();
                 return Ok(newAccount);
             }

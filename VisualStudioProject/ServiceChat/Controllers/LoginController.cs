@@ -23,6 +23,11 @@ namespace ServiceChat.Controllers
             public const string InvalidPasswordError = "InvalidPassword";
         }
 
+        /// <summary>
+        /// Authenticates GET request via session cookie or http basic auth.
+        /// Sets session cookie.
+        /// </summary>
+        /// <returns>Returns LoginResponse as JSON.</returns>
         public object Get()
         {
             try
@@ -51,6 +56,17 @@ namespace ServiceChat.Controllers
             }
         }
 
+        /// <summary>
+        /// Authenticates POST request from Post body.
+        /// Sets session cookie.
+        /// </summary>
+        /// <param name="data">
+        /// {
+        ///     "Username": "admin",
+        ///     "Password": "Geslo.01"
+        /// }
+        /// </param>
+        /// <returns>Returns LoginResponse as JSON.</returns>
         public object Post([FromBody] dynamic data)
         {
             try

@@ -106,6 +106,5 @@ namespace ServiceChat
         {
             HttpContext.Current.Session["Username"] = "";
         }
-
     }
 }
