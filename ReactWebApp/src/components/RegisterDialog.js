@@ -3,9 +3,9 @@ import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
-import Overlay from './Overlay.js'
+import Overlay from './Overlay';
 
-import {apiUrl} from '../config.js';
+import User from '../models/User';
 
 const dialogStyle = {
     maxWidth: '25rem',
@@ -24,12 +24,16 @@ const buttonStyle = {
     marginTop: "0.5rem"
 };
 
+const registerButtonStyle = {
+    width: "10rem"
+};
+
 function isAsciiOnly(str) {
     for (var i = 0; i < str.length; i++)
         if (str.charCodeAt(i) > 127)
             return false;
     return true;
-}
+};
 
 function containsTwoNumeric(str){
     var numericCharCount = 0;
@@ -38,7 +42,7 @@ function containsTwoNumeric(str){
         if (c.match(/[0-9]/i)) numericCharCount++;
     }
     return numericCharCount >= 2;
-}
+};
 
 function containsUppercase(str){
     var uppercaseCharCount = 0;
@@ -47,7 +51,7 @@ function containsUppercase(str){
         if (c.match(/[A-Z]/i)) uppercaseCharCount++;
     }
     return uppercaseCharCount > 0;
-}
+};
 
 function containsSpecial(str){
     return (str.indexOf("?") !== -1 ||
@@ -55,24 +59,9 @@ function containsSpecial(str){
            str.indexOf("*") !== -1 ||
            str.indexOf("!") !== -1 ||
            str.indexOf(":") !== -1);
-}
+};
 
-function register(username, password, displayname, onSuccess, onError){
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', apiUrl+'/Account');
-    xhr.setRequestHeader("Content-type", "application/json");
-    xhr.onload = function() {
-        if (xhr.status === 200) {
-            onSuccess();
-        }
-        else {
-            onError(xhr.response);
-        }
-    };
-    xhr.send(JSON.stringify({ Username: username, Password: password, DisplayName : name }));
-}
-
-class Register extends React.Component {
+class RegisterDialog extends React.Component {
     name = "";
     username = "";
     password = "";
@@ -81,6 +70,7 @@ class Register extends React.Component {
     state = {
         open: false,
         success: false,
+        error : null,
         nameError: "",
         usernameError: "",
         passwordError: "",
@@ -99,20 +89,23 @@ class Register extends React.Component {
     };
 
     handleRegisterClick = () => {
-        register(
-            this.username,
-            this.password,
-            this.displayname,
-            this.handleRegisterSuccess,
-            this.handleRegisterError);
+        this.setState({ waitingForResponse: true });
+        var newUser = new User(this.username, this.name);
+        newUser.register(this.password, (user, status, message) => {
+            if (user != null){
+                this.handleRegisterSuccess(user);
+            } else {
+                this.handleRegisterError(status, message);
+            }
+        });
     };
 
     handleRegisterSuccess = () => {
-        this.setState({ success: true });
+        this.setState({ success: true, waitingForResponse: false });
     };
 
-    handleRegisterError = (error) => {
-        var message = JSON.parse(error).Message;
+    handleRegisterError = (status, message) => {
+        var error = null;
         var nameError = "";
         var usernameError = "";
         var passwordError = "";
@@ -125,13 +118,15 @@ class Register extends React.Component {
             case "DuplicateUsername":
                 usernameError = "To uporabniško ime je že zasedeno"; break;
             default:
-                alert("Neznana napaka!\n"+message);
+                error = status;
         }
         this.setState({
+            error: error,
             nameError: nameError,
             usernameError: usernameError,
             passwordError: passwordError,
-            repeatError: repeatError
+            repeatError: repeatError,
+            waitingForResponse: false
         });
     };
 
@@ -163,6 +158,9 @@ class Register extends React.Component {
         } else {
             this.setState({passwordError: ""});
         }
+        if (this.repeat.length > 0 && this.password !== this.repeat){
+            this.setState({repeatError: "Gesli se ne ujemata"});
+        }
     };
 
     handleRepeatFieldChange = (e) => {
@@ -179,28 +177,50 @@ class Register extends React.Component {
     };
 
     handleClose = () => {
-        this.setState({ open: false, success: false });
+        this.setState({
+            open: false,
+            success: false,
+            error : null,
+            nameError: "",
+            usernameError: "",
+            passwordError: "",
+            repeatError: ""
+        });
     };
 
+    handleCloseErrorOverlay = () => {
+        this.setState({ error: null });
+    }
+
     render = () => {
-        const actions = [];
         const invalid = !(this.state.nameError.length === 0 &&
                         this.state.usernameError.length === 0 &&
                         this.state.passwordError.length === 0 &&
                         this.state.repeatError.length === 0 &&
                         this.username.length !== 0 &&
                         this.password.length !== 0 &&
-                        this.repeat.length !== 0);
+                        this.repeat.length !== 0 &&
+                        this.password === this.repeat);
         return (
         <div>
-            <FlatButton label="Registracija" onClick={this.handleOpen} />
+            <RaisedButton
+                style={registerButtonStyle}
+                label="Registracija"
+                onClick={this.handleOpen}
+                secondary={true}
+                disabled={this.props.disabled}/>
             <Dialog
-            title="Registracija"
-            actions={actions}
-            modal={false}
-            open={this.state.open}
-            contentStyle={dialogStyle}
-            onRequestClose={this.handleClose}>
+                title="Registracija"
+                actions={[]}
+                modal={false}
+                open={this.state.open}
+                contentStyle={dialogStyle}
+                onRequestClose={this.handleClose}>
+                <Overlay visible={this.state.error !== null}>
+                    <strong>Napaka</strong>
+                    <p>{this.state.error}}</p>
+                    <FlatButton label="V redu" onClick={this.handleCloseErrorOverlay} />
+                </Overlay>
                 <Overlay visible={this.state.success}>
                     <strong>Registracija uspešna</strong>
                     <p>Sedaj se lahko prijavite.</p>
@@ -235,7 +255,7 @@ class Register extends React.Component {
                 <RaisedButton
                     style={buttonStyle}
                     onClick={this.handleRegisterClick}
-                    disabled={invalid}
+                    disabled={invalid || this.state.waitingForResponse}
                     label="Ustvari nov račun" primary={true} />
             </Dialog>
         </div>
@@ -243,4 +263,8 @@ class Register extends React.Component {
     };
 };
 
-export default Register;
+RegisterDialog.defaultProps = {
+    disabled: false,
+};
+
+export default RegisterDialog;

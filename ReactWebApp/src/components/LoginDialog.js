@@ -3,8 +3,9 @@ import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
+import Overlay from './Overlay';
 
-import {apiUrl} from '../config.js';
+import auth from '../auth';
 
 const dialogStyle = {
     maxWidth: '25rem',
@@ -23,30 +24,20 @@ const buttonStyle = {
     marginTop: "0.5rem"
 };
 
-function login(username, password, onSuccess, onError){
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', apiUrl+'/Login');
-    xhr.setRequestHeader("Content-type", "application/json");
-    xhr.onload = function() {
-        var response = JSON.parse(xhr.response);
-        if (response.Success) {
-            onSuccess(response);
-        }
-        else {
-            onError(response);
-        }
-    };
-    xhr.send(JSON.stringify({ Username: username, Password: password }));
-};
+const loginButtonStyle = {
+    width: "10rem"
+}
 
-class Login extends React.Component {
+class LoginDialog extends React.Component {
     username = "";
     password = "";
 
     state = {
         open: false,
+        error: null,
         usernameError: "",
-        passwordError: ""
+        passwordError: "",
+        waitingForResponse: false
     };
 
     checkRequiredFields = () => {
@@ -60,44 +51,51 @@ class Login extends React.Component {
         return this.username.length > 0 && this.password.length > 0;
     };
 
-    loginChat = () => {
+    handleLoginChatClick = () => {
         if (this.checkRequiredFields()){
-            login(this.username, this.password,
-                (response) => {
+            this.setState({ waitingForResponse: true });
+            auth.login(this.username, this.password, (status, response) =>{
+                this.setState({ waitingForResponse: false });
+                if (status === 200 && response.Success){
+                    this.handleClose();
                     this.props.onLogin();
-                },
-                (response) => {
+                } else {
                     switch (response.Error){
                         case 'UserNotFound':
                             this.setState({ usernameError: "Ta račun ne obstaja" }); break;
                         case 'InvalidPassword':
                             this.setState({ passwordError: "Napačno geslo" }); break;
                         default:
-                            alert("Neznana napaka!\n"+JSON.stringify(response));
+                            this.setState({ error: status });
                     }
-                });
+                }
+            });
         }
     };
 
-    loginAdmin = () => {
+    handleLoginAdminClick = () => {
         if (this.checkRequiredFields()){
-            login(this.username, this.password,
-                (response) => {
-                    if (response.Admin)
+            this.setState({ waitingForResponse: true });
+            auth.login(this.username, this.password, (status, response) =>{
+                this.setState({ waitingForResponse: false });
+                if (status === 200 && response.Success){
+                    if (response.Admin){
+                        this.handleClose();
                         this.props.onLoginAdmin();
-                    else
+                    } else {
                         this.setState({ usernameError: "Ta račun nima administratorskih pravic" });
-                },
-                (response) => {
-                    switch (JSON.parse(response).Error){
+                    }
+                } else {
+                    switch (response.Error){
                         case 'UserNotFound':
                             this.setState({ usernameError: "Ta račun ne obstaja" }); break;
                         case 'InvalidPassword':
                             this.setState({ passwordError: "Napačno geslo" }); break;
                         default:
-                            alert("Neznana napaka!\n"+JSON.stringify(response));
+                            this.setState({ error: status });
                     }
-                });
+                }
+            });
         }
     };
 
@@ -121,18 +119,31 @@ class Login extends React.Component {
         this.setState({ open: false });
     };
 
+    handleCloseErrorOverlay = () => {
+        this.setState({ error: null });
+    };
+
     render = () => {
-        const actions = [];
         return (
         <div>
-            <RaisedButton label="Prijava" onClick={this.handleOpen} primary={true} />
+            <RaisedButton 
+                style={loginButtonStyle}
+                label="Prijava"
+                onClick={this.handleOpen}
+                primary={true}
+                disabled={this.props.disabled}/>
             <Dialog
             title="Prijava"
-            actions={actions}
+            actions={[]}
             modal={false}
             open={this.state.open}
             contentStyle={dialogStyle}
             onRequestClose={this.handleClose}>
+                <Overlay visible={this.state.error !== null}>
+                    <strong>Napaka</strong>
+                    <p>{this.state.error}}</p>
+                    <FlatButton label="V redu" onClick={this.handleCloseErrorOverlay} />
+                </Overlay>
                 <TextField
                     style={inputStyle}
                     floatingLabelText="Uporabniško ime"
@@ -148,11 +159,13 @@ class Login extends React.Component {
                 /><br />
                 <RaisedButton
                     style={buttonStyle}
-                    onClick={this.loginChat}
+                    onClick={this.handleLoginChatClick}
+                    disabled={this.state.waitingForResponse}
                     label="Prijava v klepet" primary={true} /><br/>
                 <FlatButton
                     style={buttonStyle}
-                    onClick={this.loginAdmin}
+                    onClick={this.handleLoginAdminClick}
+                    disabled={this.state.waitingForResponse}
                     label="Administratorske strani" secondary={true} /><br/>
             </Dialog>
         </div>
@@ -160,4 +173,10 @@ class Login extends React.Component {
     };
 };
 
-export default Login;
+LoginDialog.defaultProps = {
+    onLogin: () => {},
+    onLoginAdmin: () => {},
+    disabled: false,
+};
+
+export default LoginDialog;
