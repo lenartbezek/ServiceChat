@@ -87,8 +87,13 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="favicon.ico" />
+    <Content Include="index.html" />
     <Content Include="packages.config" />
+    <Content Include="asset-manifest.json" />
     <None Include="Properties\PublishProfiles\IS-ServiceChat - Web Deploy.pubxml" />
+    <Content Include="static\css\main.d1ddca6d.css.map" />
+    <Content Include="static\js\main.c7fc3a20.js.map" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -101,8 +106,9 @@
     <Content Include="App_Data\chatdb_log.ldf">
       <DependentUpon>chatdb.mdf</DependentUpon>
     </Content>
-    <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
+    <Content Include="static\css\main.d1ddca6d.css" />
+    <Content Include="static\js\main.c7fc3a20.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>

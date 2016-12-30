@@ -10,15 +10,16 @@ namespace ServiceChat.Controllers
         // Posts a new message
         public object Post([FromBody]dynamic data)
         {
+            if (data == null ||
+                data.Text == null)
+                return BadRequest();
+
             try
             {
                 var account = Authenticate();
                 if (account == null) return Unauthorized();
 
-                if (data.GetType().GetProperty("Text") != null)
-                    return BadRequest();
-
-                var message = new Message(account, data.text);
+                var message = new Message(account, (string) data.Text);
                 message.Create();
                 return Ok(message);
             }
@@ -32,6 +33,10 @@ namespace ServiceChat.Controllers
         [Route("/{id}")]
         public object Put(int id, [FromBody]dynamic data)
         {
+            if (data == null ||
+                data.Text == null)
+                return BadRequest();
+
             try
             {
                 var account = Authenticate();
@@ -42,10 +47,7 @@ namespace ServiceChat.Controllers
 
                 if (message.Username != account.Username || !account.Admin) return Unauthorized();
 
-                if (data.GetType().GetProperty("Text") != null)
-                    return BadRequest();
-
-                message.Edit(data.Text);
+                message.Text = (string) data.Text;
                 message.Update();
                 return Ok(message);
             }

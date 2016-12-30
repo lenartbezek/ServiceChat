@@ -10,8 +10,7 @@ CREATE TABLE [dbo].[Pogovor] (
     [id]       INT          IDENTITY (1, 1) NOT NULL,
     [username] VARCHAR (50) NOT NULL,
     [besedilo] TEXT         NULL,
-    [time]     DATETIME     NOT NULL,
-    [edit]     DATETIME NULL, 
+    [time]     DATETIME     NOT NULL
     PRIMARY KEY CLUSTERED ([id] ASC)
 );
      */
@@ -26,13 +25,11 @@ CREATE TABLE [dbo].[Pogovor] (
         [DataMember]
         public int Id { get; private set; }
         [DataMember]
-        public string Text { get; private set; }
+        public string Text { get; set; }
         [DataMember]
         public string Username { get; private set; }
         [DataMember]
         public DateTime Time { get; private set; }
-        [DataMember]
-        public DateTime Edited { get; private set; }
 
         public Message(Account account, string text)
         {
@@ -44,17 +41,6 @@ CREATE TABLE [dbo].[Pogovor] (
         private Message(int id)
         {
             Id = id;
-        }
-
-        /// <summary>
-        /// Edits text and sets edited mark.
-        /// Requries a call to Update() to save changes.
-        /// </summary>
-        /// <param name="newText">New text to be saved.</param>
-        public void Edit(string newText)
-        {
-            Text = newText;
-            Edited = DateTime.UtcNow;
         }
 
         /// <summary>
@@ -84,8 +70,7 @@ CREATE TABLE [dbo].[Pogovor] (
                     {
                         Username = (string)reader["username"],
                         Text = (string)reader["besedilo"],
-                        Time = ((DateTime)reader["time"]).ToUniversalTime(),
-                        Edited = ((DateTime)reader["time"]).ToUniversalTime(),
+                        Time = ((DateTime)reader["time"]).ToUniversalTime()
                     };
                 }
             }
@@ -119,8 +104,7 @@ CREATE TABLE [dbo].[Pogovor] (
                     {
                         Username = (string)reader["username"],
                         Text = (string)reader["besedilo"],
-                        Time = ((DateTime)reader["time"]).ToUniversalTime(),
-                        Edited = ((DateTime)reader["time"]).ToUniversalTime()
+                        Time = ((DateTime)reader["time"]).ToUniversalTime()
                     };
 
                     list.Add(message);
@@ -164,8 +148,7 @@ CREATE TABLE [dbo].[Pogovor] (
                     {
                         Username = (string)reader["username"],
                         Text = (string)reader["besedilo"],
-                        Time = ((DateTime)reader["time"]).ToUniversalTime(),
-                        Edited = ((DateTime)reader["time"]).ToUniversalTime()
+                        Time = ((DateTime)reader["time"]).ToUniversalTime()
                     };
 
                     list.Add(message);
@@ -204,8 +187,7 @@ CREATE TABLE [dbo].[Pogovor] (
                     {
                         Username = (string)reader["username"],
                         Text = (string)reader["besedilo"],
-                        Time = ((DateTime)reader["time"]).ToUniversalTime(),
-                        Edited = ((DateTime)reader["time"]).ToUniversalTime()
+                        Time = ((DateTime)reader["time"]).ToUniversalTime()
                     };
 
                     list.Add(message);
@@ -254,12 +236,11 @@ CREATE TABLE [dbo].[Pogovor] (
             conn.Open();
 
             var command = new SqlCommand(
-                "UPDATE Pogovor SET besedilo=@besedilo, edited=@time" +
+                "UPDATE Pogovor SET besedilo=@besedilo" +
                 "WHERE id=@id",
                 conn);
             command.Parameters.AddWithValue("@id", Id);
             command.Parameters.AddWithValue("@besedilo", Text);
-            command.Parameters.AddWithValue("@time", Time);
 
             command.ExecuteNonQuery();
 

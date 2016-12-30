@@ -2,7 +2,6 @@
 using System.Web;
 using System.Web.Http;
 using System.Web.Routing;
-using System.Web.SessionState;
 
 namespace ServiceChat
 {
@@ -31,7 +30,7 @@ namespace ServiceChat
 
         protected void Application_PostAuthorizeRequest()
         {
-            HttpContext.Current.SetSessionStateBehavior(SessionStateBehavior.Required);
+
         }
 
         protected void Application_Error(object sender, EventArgs e)
