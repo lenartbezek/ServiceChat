@@ -4,8 +4,8 @@ using static ServiceChat.Authentication;
 
 namespace ServiceChat.Controllers
 {
-    [RoutePrefix("api/account")]
-    public class AccountController : ApiController
+    [RoutePrefix("api/me")]
+    public class MeController : ApiController
     {
 
         // Get logged in user data

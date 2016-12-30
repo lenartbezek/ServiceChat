@@ -109,8 +109,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Authentication.cs" />
-    <Compile Include="Controllers\AccountController.cs" />
-    <Compile Include="Controllers\AdminController.cs" />
+    <Compile Include="Controllers\MeController.cs" />
+    <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="Database.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>

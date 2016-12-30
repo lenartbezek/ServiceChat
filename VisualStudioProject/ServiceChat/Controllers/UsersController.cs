@@ -4,8 +4,8 @@ using static ServiceChat.Authentication;
 
 namespace ServiceChat.Controllers
 {
-    [RoutePrefix("api/admin")]
-    public class AdminController : ApiController
+    [RoutePrefix("api/users")]
+    public class UsersController : ApiController
     {
         // Get all accounts
         public object Get()
@@ -13,7 +13,7 @@ namespace ServiceChat.Controllers
             try
             {
                 var account = Authenticate();
-                if (account == null || !account.Admin) return Unauthorized();
+                if (account == null) return Unauthorized();
 
                 return Ok(Account.GetAll());
             }
@@ -23,9 +23,26 @@ namespace ServiceChat.Controllers
             }
         }
 
+        // Get account by username
+        [Route("/{id}")]
+        public object Get(string id)
+        {
+            try
+            {
+                var account = Authenticate();
+                if (account == null) return Unauthorized();
+
+                return Ok(Account.Get(id));
+            }
+            catch
+            {
+                return InternalServerError();
+            }
+        }
+
         // Edit user
-        [Route("/{username}")]
-        public object Put(string username, [FromBody]dynamic data)
+        [Route("/{id}")]
+        public object Put(string id, [FromBody]dynamic data)
         {
             if (data == null ||
                 data.DisplayName == null)
@@ -36,7 +53,7 @@ namespace ServiceChat.Controllers
                 var account = Authenticate();
                 if (account == null) return Unauthorized();
 
-                var victim = Account.Get(username);
+                var victim = Account.Get(id);
                 if (victim == null) return NotFound();
 
                 if (account.Username != victim.Username && !account.Admin) return Unauthorized();
