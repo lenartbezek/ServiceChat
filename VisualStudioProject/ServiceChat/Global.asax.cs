@@ -51,9 +51,10 @@ namespace ServiceChat
         private static void RegisterRoutes(RouteCollection routes)
         {
             routes.MapHttpRoute(
-                name: "DefaultApi",
+                name: "api",
                 routeTemplate: "api/{controller}/{id}",
                 defaults: new { id = RouteParameter.Optional });
+            routes.MapPageRoute("Default", "{*anything}", "~/index.html");
         }
     }
 }
