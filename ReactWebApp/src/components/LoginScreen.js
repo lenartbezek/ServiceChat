@@ -1,9 +1,12 @@
 import React from 'react';
 import LoginDialog from './LoginDialog';
 import RegisterDialog from './RegisterDialog';
+import FlatButton from 'material-ui/FlatButton';
 import { browserHistory } from 'react-router';
+
 import auth from '../auth.js';
-import {apiUrl} from '../config.js';
+
+import User from '../models/User';
 
 const overlayStyle = {
     position: "fixed",
@@ -29,8 +32,7 @@ const titleStyle = {
 }
 
 const messageStyle = {
-    margin: "2rem",
-
+    margin: "2rem"
 }
 
 const buttonRowStyle = {
@@ -39,6 +41,12 @@ const buttonRowStyle = {
     justifyContent: "center",
     alignItems: "center"
 }
+
+const buttonStyle = {
+    width: "16rem",
+    margin: "auto",
+    marginTop: "0.5rem"
+};
 
 const fadeOutStyle = {
     opacity:0,
@@ -56,12 +64,37 @@ const spacerStyle = {
 
 class LoginScreen extends React.Component {
     state = {
-        connected: false,
-        message: "Za obisk te spletne strani morate biti prijavljeni."
+        showOptions: false,
+        loggedIn: false,
+        message: "..."
     };
 
     componentDidMount = () => {
-        setTimeout( () => { this.setState({ connected: true }); }, 500);
+        if (auth.loggedIn()){
+            User.me((user, status, res) => {
+                if (user != null){
+                    this.setState({
+                        message: "Prijavljeni ste kot "+user.DisplayName+".",
+                        loggedIn: true,
+                        showOptions: true
+                    });
+                } else {
+                    this.setState({
+                        message: "Napaka pri prijavi. Poskusite ponovno.",
+                        loggedIn: false,
+                        showOptions: true
+                    });
+                }
+            });
+        } else {
+            setTimeout( () => {
+                this.setState({
+                    message: "Za ogled te strani se morate prijaviti.",
+                    loggedIn: false,
+                    showOptions: true
+                });
+            }, 500);
+        }
     };
 
     handleLoginChatSuccess = () => {
@@ -70,7 +103,20 @@ class LoginScreen extends React.Component {
 
     handleLoginAdminSuccess = () => {
         browserHistory.push('/admin');
-    }
+    };
+
+    handleLogOut = () => {
+        this.setState({ showOptions: false });
+        auth.logout(() => {
+            setTimeout( () => {
+                this.setState({
+                    message: "Uspešno ste se odjavili.",
+                    loggedIn: false,
+                    showOptions: true
+                });
+            }, 500);
+        });
+    };
 
     handleLoginError = () => {
         
@@ -78,22 +124,36 @@ class LoginScreen extends React.Component {
 
     render = () => {
         var fadeStyle = fadeOutStyle;
-        if (this.state.connected){
+        if (this.state.showOptions)
             fadeStyle = fadeInStyle;
+
+        let options = null;
+        if (this.state.loggedIn){
+            options = (
+                <div style={{...buttonRowStyle, ...fadeStyle}}>
+                    <FlatButton 
+                        label="Odjavi se" 
+                        style={buttonStyle}
+                        disabled={!this.state.showOptions}
+                        onClick={this.handleLogOut} />
+                </div>
+            );
+        } else {
+            options = (
+                <div style={{...buttonRowStyle, ...fadeStyle}}>
+                    <LoginDialog
+                        onLogin={this.handleLoginChatSuccess}
+                        onLoginAdmin={this.handleLoginAdminSuccess}/>
+                    <div style={spacerStyle}></div>
+                    <RegisterDialog />
+                </div>
+            );
         }
         return (
             <div style={overlayStyle}>
                 <span style={titleStyle}>ServiceChat</span>
                 <span style={{...messageStyle, ...fadeStyle}}>{this.state.message}</span>
-                <div style={{...buttonRowStyle, ...fadeStyle}}>
-                    <LoginDialog
-                        onLogin={this.handleLoginChatSuccess}
-                        onLoginAdmin={this.handleLoginAdminSuccess}
-                        disabled={!this.state.connected}/>
-                    <div style={spacerStyle}></div>
-                    <RegisterDialog 
-                        disabled={!this.state.connected}/>
-                </div>
+                {options}
             </div>
         );
     };

@@ -264,7 +264,7 @@ class RegisterDialog extends React.Component {
 };
 
 RegisterDialog.defaultProps = {
-    disabled: false,
+    disabled: false
 };
 
 export default RegisterDialog;
