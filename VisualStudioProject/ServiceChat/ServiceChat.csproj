@@ -87,36 +87,13 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Chat.aspx" />
-    <Content Include="js\moment-locale.min.js" />
-    <Content Include="Login.aspx" />
+    <Content Include="favicon.ico" />
+    <Content Include="index.html" />
     <Content Include="packages.config" />
-    <Content Include="fonts\fontello\fontello.eot" />
-    <Content Include="fonts\fontello\fontello.ttf" />
-    <Content Include="fonts\fontello\fontello.woff" />
-    <Content Include="fonts\fontello\fontello.woff2" />
-    <Content Include="fonts\roboto\Roboto-Bold.eot" />
-    <Content Include="fonts\roboto\Roboto-Bold.ttf" />
-    <Content Include="fonts\roboto\Roboto-Bold.woff" />
-    <Content Include="fonts\roboto\Roboto-Bold.woff2" />
-    <Content Include="fonts\roboto\Roboto-Light.eot" />
-    <Content Include="fonts\roboto\Roboto-Light.ttf" />
-    <Content Include="fonts\roboto\Roboto-Light.woff" />
-    <Content Include="fonts\roboto\Roboto-Light.woff2" />
-    <Content Include="fonts\roboto\Roboto-Medium.eot" />
-    <Content Include="fonts\roboto\Roboto-Medium.ttf" />
-    <Content Include="fonts\roboto\Roboto-Medium.woff" />
-    <Content Include="fonts\roboto\Roboto-Medium.woff2" />
-    <Content Include="fonts\roboto\Roboto-Regular.eot" />
-    <Content Include="fonts\roboto\Roboto-Regular.ttf" />
-    <Content Include="fonts\roboto\Roboto-Regular.woff" />
-    <Content Include="fonts\roboto\Roboto-Regular.woff2" />
-    <Content Include="fonts\roboto\Roboto-Thin.eot" />
-    <Content Include="fonts\roboto\Roboto-Thin.ttf" />
-    <Content Include="fonts\roboto\Roboto-Thin.woff" />
-    <Content Include="fonts\roboto\Roboto-Thin.woff2" />
-    <None Include="Properties\PublishProfiles\ChatDB - Web Deploy.pubxml" />
+    <Content Include="asset-manifest.json" />
     <None Include="Properties\PublishProfiles\IS-ServiceChat - Web Deploy.pubxml" />
+    <Content Include="static\css\main.d1ddca6d.css.map" />
+    <Content Include="static\js\main.c7fc3a20.js.map" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -129,55 +106,28 @@
     <Content Include="App_Data\chatdb_log.ldf">
       <DependentUpon>chatdb.mdf</DependentUpon>
     </Content>
-    <Content Include="css\animation.css" />
-    <Content Include="css\fontello.css" />
-    <Content Include="css\main.css" />
-    <Content Include="css\materialize.min.css" />
-    <Content Include="favicon.ico" />
-    <Content Include="fonts\fontello\fontello.svg" />
     <Content Include="Global.asax" />
-    <Content Include="js\jquery-3.1.1.min.js" />
-    <Content Include="js\materialize.min.js" />
-    <Content Include="js\moment.min.js" />
-    <None Include="Master.master" />
+    <Content Include="static\css\main.d1ddca6d.css" />
+    <Content Include="static\js\main.c7fc3a20.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AccountController.cs" />
-    <Compile Include="Chat.aspx.cs">
-      <DependentUpon>Chat.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Chat.aspx.designer.cs">
-      <DependentUpon>Chat.aspx</DependentUpon>
-    </Compile>
+    <Compile Include="Authentication.cs" />
+    <Compile Include="Controllers\MeController.cs" />
+    <Compile Include="Controllers\RegisterController.cs" />
+    <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="Database.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Login.aspx.cs">
-      <DependentUpon>Login.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Login.aspx.designer.cs">
-      <DependentUpon>Login.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="LoginController.cs" />
-    <Compile Include="Master.master.cs">
-      <DependentUpon>Master.master</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Master.master.designer.cs">
-      <DependentUpon>Master.master</DependentUpon>
-    </Compile>
-    <Compile Include="Message.cs" />
-    <Compile Include="MessagesController.cs" />
+    <Compile Include="Controllers\LoginController.cs" />
+    <Compile Include="Models\Message.cs" />
+    <Compile Include="Controllers\MessagesController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Account.cs" />
-    <Compile Include="SendController.cs" />
-    <Compile Include="UserController.cs" />
+    <Compile Include="Models\Account.cs" />
+    <Compile Include="Controllers\SendController.cs" />
   </ItemGroup>
   <ItemGroup />
   <PropertyGroup>
