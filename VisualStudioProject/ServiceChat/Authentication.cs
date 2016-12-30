@@ -8,37 +8,11 @@ namespace ServiceChat
 {
     public class Authentication
     {
-        public enum AuthenticationType
-        {
-            Any = 0,
-            BasicHttp = 1,
-            SessionCookie = 2
-        }
-
-        /// <summary>
-        /// Authenticates current user.
-        /// Returns Account if successful and null otherwise.
-        /// </summary>
-        public static Account Authenticate(AuthenticationType type = AuthenticationType.Any)
-        {
-            switch (type)
-            {
-                case AuthenticationType.Any:
-                    return AuthenticateBasicHttp() ?? AuthenticateCookie();
-                case AuthenticationType.BasicHttp:
-                    return AuthenticateBasicHttp();
-                case AuthenticationType.SessionCookie:
-                    return AuthenticateCookie();
-                default:
-                    return null;
-            }
-        }
-
         /// <summary>
         /// Authenticates using BasicHttp authentication from request headers.
         /// </summary>
         /// <returns>Authenticated account if successful and null otherwise.</returns>
-        public static Account AuthenticateBasicHttp()
+        public static Account Authenticate()
         {
             var request = HttpContext.Current.Request;
             var authHeader = request.Headers["Authorization"];
@@ -70,41 +44,6 @@ namespace ServiceChat
             {
                 return null;
             }
-        }
-
-        /// <summary>
-        /// Authenticates using cookie, stored by CreateAuthCookie call.
-        /// </summary>
-        /// <returns>Authenticated account if successful and null otherwise.</returns>
-        public static Account AuthenticateCookie()
-        {
-            try
-            {
-                var name = HttpContext.Current.Session["Username"] as string;
-                return string.IsNullOrEmpty(name) 
-                    ? null 
-                    : Account.Get(name);
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// Creates a session cookie for this user. To be called at login.
-        /// </summary>
-        public static void CreateAuthCookie(Account account)
-        {
-            HttpContext.Current.Session["Username"] = account.Username;
-        }
-
-        /// <summary>
-        /// Removes the session cookie for this user. To be called at logout.
-        /// </summary>
-        public static void ExpireAuthCookie()
-        {
-            HttpContext.Current.Session["Username"] = "";
         }
     }
 }

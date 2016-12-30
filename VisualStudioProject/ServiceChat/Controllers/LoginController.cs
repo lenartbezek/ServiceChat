@@ -24,7 +24,7 @@ namespace ServiceChat.Controllers
         }
 
         /// <summary>
-        /// Authenticates GET request via session cookie or http basic auth.
+        /// Authenticates GET request via http basic auth.
         /// Sets session cookie.
         /// </summary>
         /// <returns>Returns LoginResponse as JSON.</returns>
@@ -35,7 +35,6 @@ namespace ServiceChat.Controllers
                 var account = Authenticate();
                 if (account != null)
                 {
-                    CreateAuthCookie(account);
                     return Ok(new LoginResponse
                     {
                         Success = true,
