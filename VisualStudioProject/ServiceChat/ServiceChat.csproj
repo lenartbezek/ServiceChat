@@ -115,7 +115,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Authentication.cs" />
-    <Compile Include="Controllers\MeController.cs" />
     <Compile Include="Controllers\RegisterController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="Database.cs" />

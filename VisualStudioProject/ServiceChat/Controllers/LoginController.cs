@@ -17,6 +17,8 @@ namespace ServiceChat.Controllers
             public bool Admin;
             [DataMember]
             public string Error;
+            [DataMember]
+            public Account Account;
 
             public const string InvalidCredentials = "InvalidCredentials";
             public const string UserNotFoundError = "UserNotFound";
@@ -25,7 +27,6 @@ namespace ServiceChat.Controllers
 
         /// <summary>
         /// Authenticates GET request via http basic auth.
-        /// Sets session cookie.
         /// </summary>
         /// <returns>Returns LoginResponse as JSON.</returns>
         public object Get()
@@ -38,7 +39,8 @@ namespace ServiceChat.Controllers
                     return Ok(new LoginResponse
                     {
                         Success = true,
-                        Admin = account.Admin
+                        Admin = account.Admin,
+                        Account = account
                     });
                 }
                 else
@@ -57,7 +59,6 @@ namespace ServiceChat.Controllers
 
         /// <summary>
         /// Authenticates POST request from Post body.
-        /// Sets session cookie.
         /// </summary>
         /// <param name="data">
         /// {
@@ -81,7 +82,7 @@ namespace ServiceChat.Controllers
                 var valid = account.VerifyPassword((string)data.Password);
                 if (!valid) return Ok(new LoginResponse { Error = LoginResponse.InvalidPasswordError });
 
-                return new LoginResponse { Success = true, Admin = account.Admin };
+                return new LoginResponse { Success = true, Admin = account.Admin, Account = account };
             }
             catch
             {

@@ -44,24 +44,20 @@ namespace ServiceChat.Controllers
         [Route("/{id}")]
         public object Put(string id, [FromBody]dynamic data)
         {
-            if (data == null ||
-                data.DisplayName == null)
-                return BadRequest();
+            if (data == null) return BadRequest();
 
             try
             {
                 var account = Authenticate();
-                if (account == null) return Unauthorized();
+                if (account == null || !account.Admin) return Unauthorized();
 
                 var victim = Account.Get(id);
                 if (victim == null) return NotFound();
 
-                if (account.Username != victim.Username && !account.Admin) return Unauthorized();
-
-                if (data.GetType().GetProperty("DisplayName") != null)
-                    victim.DisplayName = data.DisplayName;
-                else
-                    return BadRequest();
+                if (data.DisplayName != null)
+                    victim.DisplayName = (string) data.DisplayName;
+                if (data.Admin != null)
+                    victim.Admin = (bool) data.Admin;
 
                 victim.Update();
 
@@ -74,15 +70,15 @@ namespace ServiceChat.Controllers
         }
 
         // Delete user
-        [Route("/{username}")]
-        public object Delete(string username)
+        [Route("/{id}")]
+        public object Delete(string id)
         {
             try
             {
                 var account = Authenticate();
                 if (account == null) return Unauthorized();
 
-                var victim = Account.Get(username);
+                var victim = Account.Get(id);
                 if (victim == null) return BadRequest();
 
                 if (account.Username != victim.Username && !account.Admin) return Unauthorized();
