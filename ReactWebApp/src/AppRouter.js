@@ -4,10 +4,10 @@ import Index from './components/Index';
 import LoginScreen from './components/LoginScreen';
 import ChatRoom from './components/ChatRoom';
 import AdminPanel from './components/AdminPanel';
-import auth from './auth';
+import { loggedIn } from './auth';
 
 function requireAuth(nextState, replaceState) {
-  if (!auth.loggedIn())
+  if (!loggedIn())
     replaceState({ pathname: '/login' });
 }
 

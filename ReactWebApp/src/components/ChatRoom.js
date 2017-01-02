@@ -10,6 +10,7 @@ import { browserHistory } from 'react-router';
 
 import User from '../models/User';
 import Message from '../models/Message';
+import * as auth from '../auth';
 
 const userListStyle = {
     width: "16rem",
@@ -28,31 +29,21 @@ const messageContainerStyle = {
     flexDirection: "row"
 }
 
-const titleStyle = {
-    top: "-2rem",
-    fontSize: "4rem",
-    fontWeight: 100,
-    width: "100%",
-    color: "white",
-    background: "#039BE5",
-    textAlign: "center",
-    padding : "2rem"
-}
-
 const containerStyle = {
-    height: "calc(100vh - 7rem)",
+    height: "calc(100vh - 7rem - 64px)",
     display: "flex",
     flexDirection: "row"
 }
 
 class ChatRoom extends React.Component {
     text = "";
+    getUserDataInterval = null;
+    getNewMessagesInterval = null;
 
     state = {
         messages: [],
         users: null,
-        me: null,
-        loaded: false,
+        me: auth.getUser(),
         authError: false,
         connectionError: false
     };
@@ -60,8 +51,8 @@ class ChatRoom extends React.Component {
     componentDidMount = () => {
         this.getUserData();
         this.getNewMessages();
-        window.setInterval(this.getUserData, 15000);
-        window.setInterval(this.getNewMessages, 5000);
+        this.getUserDataInterval = window.setInterval(this.getUserData, 15000);
+        this.getNewMessagesInterval = window.setInterval(this.getNewMessages, 5000);
 
         var rc = this;
         document.getElementById("messageTextField")
@@ -72,20 +63,17 @@ class ChatRoom extends React.Component {
         });
     };
 
+    componentWillUnmount = () => {
+        if (this.getUserDataInterval !== null)
+            window.clearInterval(this.getUserDataInterval);
+        if (this.getNewMessagesInterval !== null)
+            window.clearInterval(this.getNewMessagesInterval);
+    }
+
     getUserData = () => {
-        var checkIfLoaded = () => {
-            this.setState({ loaded: this.state.users !== null && this.state.me !== null });
-        };
-        User.me((user, status, res) => {
-            if (status === 200) {
-                this.setState({ 
-                    me: user
-                });
-                checkIfLoaded();
-            } else if (status === 401) {
-                this.handleAuthError();
-            } else {
-                this.handleConnectionError();
+        auth.refreshUser((status, res) => {
+            if (status === 200 && res.Status){
+                this.setState({ me: auth.getUser() });
             }
         });
         User.getAll((userArray, status, res) => {
@@ -97,10 +85,7 @@ class ChatRoom extends React.Component {
                         userDict[user.Username] = user;
                     });
                 }
-                this.setState({ 
-                    users: userDict
-                });
-                checkIfLoaded();
+                this.setState({ users: userDict });
             } else if (status === 401) {
                 this.handleAuthError();
             } else {
@@ -175,50 +160,49 @@ class ChatRoom extends React.Component {
 
     render = () => {
         return (
-            <div>
-                <Overlay 
-                    visible={!this.state.loaded}
-                    background="white">
-                    <span style={titleStyle}>ServiceChat</span>
-                    <p>Povezovanje ...</p>
-                </Overlay>
-                <Overlay visible={this.state.authError}>
-                    <h1>Dostop zavrnjen</h1>
-                    <p>
-                    Strežnik vam je zavrnil dostop. 
-                    Lahko je prišlo do napake pri avtentikaciji ali 
-                    pa je bil vaš račun onemogočen.
-                    </p>
-                    <FlatButton label="Nazaj na prijavo" onClick={() => { browserHistory.push('/login'); }} />
-                </Overlay>
-                <Overlay visible={this.state.connectionError}>
-                    <h1>Napaka v povezavi</h1>
-                    <p>
-                    Zahteva ni bila uspešna iz neznanega razloga. Poskusite ponovno.
-                    </p>
-                    <FlatButton label="V redu" onClick={() => { this.setState({connectionError: false}); }} />
-                </Overlay>
-                <div style={containerStyle}>
-                    <Paper zDepth={1} style={messageListStyle}>
-                        <MessageList 
-                            users={this.state.users}
-                            messages={this.state.messages}
-                            me={this.state.me} />
-                    </Paper>
-                    <Paper className="hideOnSmallScreen" zDepth={1} style={userListStyle} >
-                        <UserList 
-                            users={this.state.users} 
-                            me={this.state.me} />
-                    </Paper>
+            <div style={{display: "flex", flexDirection: "column", height: "100%"}}>
+                <div style={{ flex: 1 }}>
+                    <Overlay 
+                        visible={this.state.authError}
+                        background="rgba(128, 222, 234, 0.8)">
+                        <h1>Dostop zavrnjen</h1>
+                        <p>Strežnik vam je zavrnil dostop. 
+                        Lahko je prišlo do napake pri avtentikaciji ali 
+                        pa je bil vaš račun onemogočen.</p>
+                        <FlatButton label="Nazaj na prijavo" onClick={() => { browserHistory.push('/login'); }} />
+                    </Overlay>
+                    <Overlay 
+                        visible={this.state.connectionError}
+                        background="rgba(128, 222, 234, 0.8)">
+                        <h1>Napaka v povezavi</h1>
+                        <p>Zahteva ni bila uspešna iz neznanega razloga. Poskusite ponovno.</p>
+                        <FlatButton label="V redu" onClick={() => { this.setState({connectionError: false}); }} />
+                    </Overlay>
+                    <div style={containerStyle}>
+                        <Paper zDepth={1} style={messageListStyle}>
+                            <MessageList 
+                                users={this.state.users}
+                                messages={this.state.messages}
+                                me={this.state.me} />
+                        </Paper>
+                        <Paper className="hideOnSmallScreen" zDepth={1} style={userListStyle} >
+                            <UserList 
+                                users={this.state.users} 
+                                me={this.state.me} />
+                        </Paper>
+                    </div>
                 </div>
                 <Paper zDepth={1} style={messageContainerStyle}>
                     <TextField
                         id="messageTextField"
                         style={{flex: 1}}
                         onChange={this.handleTextChange}
-                        hintText="Sporočilo"/>
+                        hintText="Sporočilo"
+                        multiLine={true}
+                        rows={2}
+                        rowsMax={2}/>
                     <FlatButton
-                        style={{height: "3rem", marginLeft: "1rem"}}
+                        style={{height: "4rem", marginLeft: "1rem"}}
                         icon={<ContentSend />}/>
                 </Paper>
             </div>

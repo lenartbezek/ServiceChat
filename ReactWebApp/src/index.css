@@ -8,8 +8,22 @@ body {
   font-family: 'Roboto', sans-serif;
 }
 
+h1 {
+    font-size: 4rem;
+    font-weight: 100;
+}
+
 @media screen and (max-width: 720px) {
     .hideOnSmallScreen {
         display: none !important;
     }
+}
+
+@keyframes fadeIn {
+  0% {
+    transform: opacity 0;
+  }
+  100% {
+    transform: opacity 1;
+  }
 }

@@ -1,5 +1,5 @@
 import { apiUrl } from '../config';
-import auth from '../auth';
+import { getToken } from '../auth';
 
 function tryParseJson(raw){
     try {
@@ -12,7 +12,7 @@ function tryParseJson(raw){
 function getAllUsers(cb){
     var xhr = new XMLHttpRequest();
     xhr.open('GET', apiUrl+'/users');
-    xhr.setRequestHeader("Authorization", auth.getToken());
+    xhr.setRequestHeader("Authorization", getToken());
     xhr.onload = () => { cb(xhr.status, tryParseJson(xhr.response)); };
     xhr.send();
 }
@@ -20,15 +20,7 @@ function getAllUsers(cb){
 function getUserByUsername(username, cb){
     var xhr = new XMLHttpRequest();
     xhr.open('GET', apiUrl+'/users/'+username);
-    xhr.setRequestHeader("Authorization", auth.getToken());
-    xhr.onload = () => { cb(xhr.status, tryParseJson(xhr.response)); };
-    xhr.send();
-}
-
-function getMe(cb){
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', apiUrl+'/me');
-    xhr.setRequestHeader("Authorization", auth.getToken());
+    xhr.setRequestHeader("Authorization", getToken());
     xhr.onload = () => { cb(xhr.status, tryParseJson(xhr.response)); };
     xhr.send();
 }
@@ -39,6 +31,23 @@ function registerNewUser(username, password, name, cb){
     xhr.setRequestHeader("Content-type", "application/json");
     xhr.onload = () => { cb(xhr.status, tryParseJson(xhr.response)); };
     xhr.send(JSON.stringify({ Username: username, Password: password, DisplayName : name }));
+}
+
+function editUser(username, name, admin, cb){
+    var xhr = new XMLHttpRequest();
+    xhr.open('PUT', apiUrl+'/users/'+username);
+    xhr.setRequestHeader("Authorization", getToken());
+    xhr.setRequestHeader("Content-type", "application/json");
+    xhr.onload = () => { cb(xhr.status, tryParseJson(xhr.response)); };
+    xhr.send(JSON.stringify({ Username: username, DisplayName: name, Admin: admin }));
+}
+
+function deleteUser(username, cb){
+    var xhr = new XMLHttpRequest();
+    xhr.open('DELETE', apiUrl+'/users/'+username);
+    xhr.setRequestHeader("Authorization", getToken());
+    xhr.onload = () => { cb(xhr.status, tryParseJson(xhr.response)); };
+    xhr.send();
 }
 
 export default class User {
@@ -68,13 +77,15 @@ export default class User {
         });
     }
 
-    static me(cb){
-        getMe((status, res) => {
-            if (status === 200){
-                cb(new User(res.Username, res.DisplayName, res.Admin), status, res);
-            } else {
-                cb(null, status, res);
-            }
+    edit(cb){
+        editUser(this.Username, this.DisplayName, this.Admin, (status, res) => {
+            cb(new User(res.Username, res.DisplayName, res.Admin), status, res);
+        });
+    }
+
+    delete(cb){
+        deleteUser(this.Username, (status, res) => {
+            cb(null, status, res);
         });
     }
 

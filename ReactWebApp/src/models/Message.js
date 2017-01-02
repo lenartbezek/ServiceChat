@@ -1,5 +1,5 @@
 import { apiUrl } from '../config';
-import auth from '../auth';
+import { getToken } from '../auth';
 
 function tryParseJson(raw){
     try {
@@ -12,7 +12,7 @@ function tryParseJson(raw){
 function getAllMessages(cb){
     var xhr = new XMLHttpRequest();
     xhr.open('GET', apiUrl+'/messages');
-    xhr.setRequestHeader("Authorization", auth.getToken());
+    xhr.setRequestHeader("Authorization", getToken());
     xhr.onload = () => { cb(xhr.status, tryParseJson(xhr.response)); };
     xhr.send();
 }
@@ -20,7 +20,7 @@ function getAllMessages(cb){
 function getMessagesSince(id, cb){
     var xhr = new XMLHttpRequest();
     xhr.open('GET', apiUrl+'/messages/'+id);
-    xhr.setRequestHeader("Authorization", auth.getToken());
+    xhr.setRequestHeader("Authorization", getToken());
     xhr.onload = () => { cb(xhr.status, tryParseJson(xhr.response)); };
     xhr.send();
 }
@@ -29,7 +29,7 @@ function sendMessage(text, cb){
     var xhr = new XMLHttpRequest();
     xhr.open('POST', apiUrl+'/send');
     xhr.setRequestHeader("Content-type", "application/json");
-    xhr.setRequestHeader("Authorization", auth.getToken());
+    xhr.setRequestHeader("Authorization", getToken());
     xhr.onload = () => { cb(xhr.status, tryParseJson(xhr.response)); };
     xhr.send(JSON.stringify({ Text: text }));
 }

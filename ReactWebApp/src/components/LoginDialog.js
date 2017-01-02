@@ -5,7 +5,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 import Overlay from './Overlay';
 
-import auth from '../auth';
+import * as auth from '../auth';
 
 const dialogStyle = {
     maxWidth: '25rem',

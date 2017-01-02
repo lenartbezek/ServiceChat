@@ -6,6 +6,7 @@ import Divider from 'material-ui/Divider';
 import {List, ListItem} from 'material-ui/List';
 import ActionAccountCircle from 'material-ui/svg-icons/action/account-circle';
 import moment from 'moment';
+import { listStyle } from '../styles';
 
 moment.locale("sl-SI");
 
@@ -19,11 +20,6 @@ const timeStyle = {
     fontSize: "0.7em",
     textAlign: "right",
     flex: 1
-}
-
-const listStyle = {
-    height: "calc(100% - 48px)",
-    overflowY: "auto"
 }
 
 class MessageList extends React.Component {
