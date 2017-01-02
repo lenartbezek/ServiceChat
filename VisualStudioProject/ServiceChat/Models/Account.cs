@@ -295,25 +295,10 @@ CREATE TABLE [dbo].[Uporabnik] (
             conn.Open();
 
             var command = new SqlCommand(
-@"BEGIN TRANSACTION DeleteUser
-
-BEGIN TRY
-
-    DELETE FROM Uporabnik
-    WHERE username=@username
-
-    DELETE FROM Pogovor
-    WHERE username=@username
-
-COMMIT TRANSACTION DeleteUser
-
-END TRY
-
-BEGIN CATCH
-    ROLLBACK TRANSACTION DeleteUser
-END CATCH  
-
-GO",
+                "DELETE FROM Uporabnik " + 
+                "WHERE username=@username " + 
+                "DELETE FROM Pogovor " + 
+                "WHERE username=@username ",
                 conn);
             command.Parameters.AddWithValue("@username", Username);
             command.ExecuteNonQuery();
