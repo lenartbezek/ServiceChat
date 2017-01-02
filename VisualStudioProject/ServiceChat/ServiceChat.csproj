@@ -92,8 +92,9 @@
     <Content Include="packages.config" />
     <Content Include="asset-manifest.json" />
     <None Include="Properties\PublishProfiles\IS-ServiceChat - Web Deploy.pubxml" />
-    <Content Include="static\css\main.d1ddca6d.css.map" />
-    <Content Include="static\js\main.c7fc3a20.js.map" />
+    <Content Include="static\css\main.4b7e586f.css" />
+    <Content Include="static\js\main.f1d3de83.js.map" />
+    <Content Include="static\css\main.4b7e586f.css.map" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -107,15 +108,13 @@
       <DependentUpon>chatdb.mdf</DependentUpon>
     </Content>
     <Content Include="Global.asax" />
-    <Content Include="static\css\main.d1ddca6d.css" />
-    <Content Include="static\js\main.c7fc3a20.js" />
+    <Content Include="static\js\main.f1d3de83.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Authentication.cs" />
-    <Compile Include="Controllers\MeController.cs" />
     <Compile Include="Controllers\RegisterController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="Database.cs" />
