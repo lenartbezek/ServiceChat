@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#262626</color>
-    <color name="colorAccent">#004d99</color>
-    <color name="loginButtonColor">#004d99</color>
-    <color name="appBG">#e6ffff</color>
+    <color name="colorPrimary">#1976D2</color>
+    <color name="colorPrimaryDark">#0d47a1</color>
+    <color name="colorAccent">#b2dfdb</color>
 </resources>

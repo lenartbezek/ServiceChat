@@ -1,4 +1,8 @@
 <resources>
-    <string name="app_name">ServiceChatTM</string>
+    <string name="app_name">ServiceChat</string>
+    <string name="api_base_url">http://is-servicechat.azurewebsites.net/api</string>
     <string name="title_activity_msg">MsgActivity</string>
+
+    <string name="error_usernotfound">User not found</string>
+    <string name="error_invalidpassword">Invalid password</string>
 </resources>

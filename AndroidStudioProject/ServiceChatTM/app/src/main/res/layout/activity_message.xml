@@ -4,7 +4,6 @@
     android:id="@+id/activity_msg"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/appBG"
     tools:context="com.example.admin.servicechattm.ui.MessageActivity">
 
     <android.support.v7.widget.RecyclerView
@@ -24,7 +23,6 @@
         android:layout_alignTop="@+id/bSend"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:background="@color/loginButtonColor"
         />
 
     <Button
@@ -38,7 +36,6 @@
         android:layout_marginTop="41dp"
         android:layout_toLeftOf="@+id/bRefresh"
         android:layout_toStartOf="@+id/bRefresh"
-        android:background="@color/loginButtonColor"
         />
 
     <EditText
