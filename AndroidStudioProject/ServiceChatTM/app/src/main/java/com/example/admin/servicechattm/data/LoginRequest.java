@@ -1,7 +1,5 @@
 package com.example.admin.servicechattm.data;
 
-import android.util.Log;
-import android.widget.Toast;
 import com.android.volley.*;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.admin.servicechattm.Auth;
@@ -25,7 +23,7 @@ public class LoginRequest{
     public static final String ERROR_INVALID_PASSWORD = "InvalidPassword";
 
     public interface ResponseListener {
-        void onSuccess();
+        void onSuccessfulLogin();
         void onError(String error);
     }
 
@@ -45,7 +43,6 @@ public class LoginRequest{
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        final String requestBody = jsonBody.toString();
         return new JsonObjectRequest(Request.Method.POST, fullRequestUrl, jsonBody,
                 new Response.Listener<JSONObject>() {
                     @Override
@@ -72,21 +69,21 @@ public class LoginRequest{
     public static JsonObjectRequest create(final String token, final ResponseListener listener) {
         String fullRequestUrl = ServiceChatApp.getContext().getResources().getString(R.string.api_base_url)+LOGIN_REQUEST_URL;
         return new JsonObjectRequest(Request.Method.GET, fullRequestUrl, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        handleLoginResponse(response, listener);
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error){
-                        handleLoginError(error.networkResponse.statusCode, listener);
-                    }
+            new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    handleLoginResponse(response, listener);
                 }
+            },
+            new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error){
+                    handleLoginError(error.networkResponse.statusCode, listener);
+                }
+            }
         ) {
             @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
+            public Map<String, String> getHeaders() {
                 Map<String, String> map = new HashMap<>();
                 map.put("Authorization", token);
                 return map;
@@ -98,7 +95,7 @@ public class LoginRequest{
         try{
             if (response.getBoolean("Success")){
                 User.setMe(User.fromJsonObject(response.getJSONObject("Account")));
-                listener.onSuccess();
+                listener.onSuccessfulLogin();
             } else {
                 listener.onError(response.getString("Error"));
             }

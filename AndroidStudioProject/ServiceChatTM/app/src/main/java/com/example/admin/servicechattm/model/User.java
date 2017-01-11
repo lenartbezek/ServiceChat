@@ -1,9 +1,13 @@
 package com.example.admin.servicechattm.model;
 
+import com.example.admin.servicechattm.MessageActivity;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Hashtable;
+import java.util.LinkedList;
+import java.util.List;
 
 public class User {
 
@@ -22,11 +26,28 @@ public class User {
         return user;
     }
 
+    public static List<User> fromJsonArray(JSONArray array) throws JSONException {
+        LinkedList<User> list = new LinkedList<>();
+        for(int i = 0; i < array.length(); i++){
+            list.add(fromJsonObject(array.getJSONObject(i)));
+        }
+        return list;
+    }
+
+    public static void set(List<User> newUsers){
+        users.clear();
+        for (User u : newUsers)
+            users.put(u.username, u);
+    }
+
+    public static void set(User newUser){
+        users.put(newUser.username, newUser);
+    }
+
     public static User get(String username){
         if (users.containsKey(username)){
             return users.get(username);
         } else {
-            // TODO: Make request and insert user
             return null;
         }
     }
@@ -36,8 +57,11 @@ public class User {
         me = user;
     }
 
+    public static User getMe(){
+        return me;
+    }
+
     public static Hashtable<String, User> getAll(){
-        // TODO: Make REST request and update all users
         return users;
     }
 

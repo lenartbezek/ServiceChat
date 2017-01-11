@@ -1,50 +1,53 @@
 package com.example.admin.servicechattm.model;
 
+import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class Message {
 
-    // ISO-8601 time format. Example: 2016-12-30T22:42:49.493Z
-    private static DateFormat timeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
     private static LinkedList<Message> messages = new LinkedList<>();
 
     public int id;
     public String username;
     public String text;
-    public Date time;
+    public DateTime time;
 
     public static Message fromJsonObject(JSONObject object) throws JSONException, ParseException {
         Message message = new Message();
         message.id = object.getInt("Id");
         message.username = object.getString("Username");
         message.text = object.getString("Text");
-        message.time = timeFormat.parse(object.getString("Time"));
+        message.time = DateTime.parse(object.getString("Time")); // Example: 2016-12-30T22:42:49.493Z
         return message;
     }
 
     public static List<Message> fromJsonArray(JSONArray array) throws JSONException, ParseException {
         LinkedList<Message> list = new LinkedList<>();
-        for(int i = 0; i < array.length(); i++){
+        for(int i = array.length() -1; i >= 0; i--){
             list.add(fromJsonObject(array.getJSONObject(i)));
         }
         return list;
     }
 
+    public static void set(List<Message> newMessages){
+        messages.clear();
+        messages.addAll(newMessages);
+    }
+
+    public static void set(Message newMessage){
+        messages.add(0, newMessage);
+    }
+
     public static Message get(int id){
-        for (int i = 0; i < messages.size(); i++){
-            if (messages.get(i).id == id) return messages.get(i);
+        for (Message message : messages) {
+            if (message.id == id) return message;
         }
-        // TODO: Make request and insert message to list
         return null;
     }
 
@@ -52,20 +55,10 @@ public class Message {
      * @return A list of all messeges.
      */
     public static List<Message> getAll(){
-        // TODO: Get all messages and create list
         return messages;
     }
 
-    /**
-     * @return A list of all messages with only the new ones updated.
-     */
-    public static List<Message> getNew(){
-        if (messages.size() < 1)
-            return getAll();
-
-        // TODO: Get all messages since last message and append to list
-        Message lastMessage = messages.get(messages.size() - 1);
-
-        return messages;
+    public static int count(){
+        return messages.size();
     }
 }

@@ -79,7 +79,7 @@ public class Auth {
      */
     public static boolean deleteToken(){
         token = null;
-        File file = new File(TOKEN_PATH);
+        File file = new File(ServiceChatApp.getContext().getFilesDir(), TOKEN_PATH);
         return file.delete();
     }
 

@@ -4,11 +4,11 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 
 import android.widget.FrameLayout;
+import android.widget.Toast;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 import com.example.admin.servicechattm.data.LoginRequest;
@@ -22,7 +22,6 @@ public class LoginActivity extends AppCompatActivity implements LoginRequest.Res
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_login);
 
         etUsername = (EditText) findViewById(R.id.etUsername);
@@ -62,7 +61,7 @@ public class LoginActivity extends AppCompatActivity implements LoginRequest.Res
     }
 
     @Override
-    public void onSuccess() {
+    public void onSuccessfulLogin() {
         Intent intent = new Intent(LoginActivity.this, MessageActivity.class);
         LoginActivity.this.startActivity(intent);
         finish();
@@ -73,7 +72,7 @@ public class LoginActivity extends AppCompatActivity implements LoginRequest.Res
         overlay.setVisibility(View.INVISIBLE);
         switch (error){
             case LoginRequest.ERROR_CONNECTION:
-                // TODO: Make toast
+                Toast.makeText(this, getResources().getString(R.string.error_connection), Toast.LENGTH_LONG).show();
                 break;
             case LoginRequest.ERROR_USER_NOT_FOUND:
                 etUsername.setError(getResources().getString(R.string.error_usernotfound));
@@ -82,7 +81,7 @@ public class LoginActivity extends AppCompatActivity implements LoginRequest.Res
                 etPassword.setError(getResources().getString(R.string.error_invalidpassword));
                 break;
             case LoginRequest.ERROR_INVALID_CREDENTIALS:
-                // TODO: Make toast
+                Toast.makeText(this, getResources().getString(R.string.error_invalidcredentials), Toast.LENGTH_LONG).show();
                 break;
         }
     }
