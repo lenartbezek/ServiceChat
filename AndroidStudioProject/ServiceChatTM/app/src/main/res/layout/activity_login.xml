@@ -4,9 +4,23 @@
     android:id="@+id/activity_login"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.admin.servicechattm.ui.LoginActivity">
+    tools:context="com.example.admin.servicechattm.LoginActivity">
 
+    <FrameLayout
+            android:visibility="invisible"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true" android:id="@+id/loadingOverlay"
+            android:translationZ="1dp"
+            android:background="@color/colorOverlay">
 
+        <ProgressBar
+                android:id="@+id/loginProgressbar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:indeterminate="true" android:layout_gravity="center"/>
+
+    </FrameLayout>
     <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content" android:layout_centerVertical="true"
@@ -32,14 +46,6 @@
                 android:layout_alignParentStart="true" android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true" android:layout_margin="20dp"
                 android:backgroundTint="@color/colorPrimary"/>
-
-        <ProgressBar
-                android:id="@+id/loginProgressbar"
-                android:visibility="invisible"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:indeterminate="true"
-                android:layout_centerInParent="true"/>
 
         <TextView
                 android:text="Service Chat™"
