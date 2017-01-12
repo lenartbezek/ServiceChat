@@ -33,7 +33,10 @@ class MainAppBar extends React.Component {
     }
 
     handleLogoutClick = () => {
-        User.logout(() => { browserHistory.push('/login'); })
+        User.logout(() => { 
+            this.handleDrawerClose();
+            browserHistory.push('/login');
+        })
     }
 
     render = () => {
@@ -60,11 +63,11 @@ class MainAppBar extends React.Component {
                     <MenuItem 
                         primaryText="Klepetalnica" 
                         leftIcon={<IconChat />}
-                        onClick={() => { browserHistory.push('/'); }}/>
+                        onClick={() => { this.handleDrawerClose(); browserHistory.push('/'); }}/>
                     <MenuItem 
                         primaryText="Administratorske strani" 
                         leftIcon={<IconAdmin />}
-                        onClick={() => { browserHistory.push('/admin'); }}/>
+                        onClick={() => { this.handleDrawerClose(); browserHistory.push('/admin'); }}/>
                 </Drawer>
             </div>
         );

@@ -1,6 +1,4 @@
-const maxCacheAge = 2 * 60 * 1000; // 2 minutes
 var users = null;
-var usersAge = 0;
 var me = null;
 const apiUrl = window['api_url'];
 
@@ -17,33 +15,27 @@ export default class User {
         this.Username = username;
         this.DisplayName = name;
         this.Admin = admin;
-        this.CacheAge = new Date();
     }
 
     static getAll(cb){
         if (typeof cb !== "function") 
             return users !== null ? users : {};
-        if (users === null || ((new Date()) - usersAge > maxCacheAge)){
-            var xhr = new XMLHttpRequest();
-            xhr.open('GET', apiUrl+'/users');
-            xhr.setRequestHeader("Authorization", localStorage.token);
-            xhr.onload = () => { 
-                const res = tryParseJson(xhr.response);
-                if (xhr.status === 200){
-                    users ={};
-                    res.forEach((u) => {
-                        users[u.Username] = new User(u.Username, u.DisplayName, u.Admin);
-                    });
-                    usersAge = new Date();
-                    cb(users, 200, {});
-                } else {
-                    cb(null, xhr.status, res);
-                }
-            };
-            xhr.send();
-        } else {
-            cb(users, 200, {});
-        }
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', apiUrl+'/users');
+        xhr.setRequestHeader("Authorization", localStorage.token);
+        xhr.onload = () => { 
+            const res = tryParseJson(xhr.response);
+            if (xhr.status === 200){
+                users ={};
+                res.forEach((u) => {
+                    users[u.Username] = new User(u.Username, u.DisplayName, u.Admin);
+                });
+                cb(users, 200, {});
+            } else {
+                cb(null, xhr.status, res);
+            }
+        };
+        xhr.send();
     }
 
     static getMe(cb){
@@ -51,24 +43,23 @@ export default class User {
             return me !== null 
                 ? me 
                 : { DisplayName: "...", Admin: true };
-        if (me === null || ((new Date()) - me.CacheAge > maxCacheAge)){
-            var xhr = new XMLHttpRequest();
-            xhr.open('GET', apiUrl+'/login');
-            xhr.setRequestHeader("Authorization", localStorage.token);
-            xhr.onload = () => { 
-                me = null;
-                const res = tryParseJson(xhr.response);
-                if (xhr.status === 200 && res.Success){
-                    me = new User(res.Account.Username, res.Account.DisplayName, res.Account.Admin);
-                    cb(me, 200, {});
-                } else {
-                    cb(me, xhr.status, res);
-                }
-            };
-            xhr.send();
-        } else {
+                
+        if (me !== null)
             cb(me, 200, {});
-        }
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', apiUrl+'/login');
+        xhr.setRequestHeader("Authorization", localStorage.token);
+        xhr.onload = () => { 
+            me = null;
+            const res = tryParseJson(xhr.response);
+            if (xhr.status === 200 && res.Success){
+                me = new User(res.Account.Username, res.Account.DisplayName, res.Account.Admin);
+                cb(me, 200, {});
+            } else {
+                cb(me, xhr.status, res);
+            }
+        };
+        xhr.send();
     }
 
     static get(username, cb){
@@ -76,10 +67,10 @@ export default class User {
             return users !== null && users.hasOwnProperty(username) 
                 ? users[username] 
                 : { DisplayName: "..." };
-        if (users.hasOwnProperty(username) && ((new Date()) - users[username].CacheAge < maxCacheAge)){
+
+        if (users === null) return { DisplayName: "..." };
+        if (users.hasOwnProperty(username))
             cb(users[username], 200, {});
-            return;
-        }
         var xhr = new XMLHttpRequest();
         xhr.open('GET', apiUrl+'/users/'+username);
         xhr.setRequestHeader("Authorization", localStorage.token);
@@ -159,8 +150,7 @@ export default class User {
         xhr.onload = () => { 
             const res = tryParseJson(xhr.response);
             if (xhr.status === 200){
-                users[this.Username] = new User(res.Username, res.DisplayName, res.Admin);
-                cb(users[this.Username], xhr.status, res);
+                cb(new User(res.Username, res.DisplayName, res.Admin), xhr.status, res);
             } else {
                 cb(null, xhr.status, res.Message);
             }

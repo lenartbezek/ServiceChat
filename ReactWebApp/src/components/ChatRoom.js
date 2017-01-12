@@ -59,7 +59,7 @@ class ChatRoom extends React.Component {
         
         this.getUserData();
         this.getMessages();
-        this.getUserDataInterval = window.setInterval(this.getUserData, 60000);
+        this.getUserDataInterval = window.setInterval(this.getUserData, 20000);
         this.getMessagesInterval = window.setInterval(this.getMessages, 5000);
 
         var rc = this;
@@ -113,14 +113,6 @@ class ChatRoom extends React.Component {
             if (status === 200){
                 this.setState({ messages: messageArray });
                 this.scrollToBottom();
-                for (var i = 0; i < messageArray.length; i++){
-                    var m = messageArray[i];
-                    if (User.get(m.Username) == null){
-                        User.get(m.Username, (user, status, res) => {
-                            this.setState({ messages: messageArray });
-                        });
-                    }
-                }
             } else if (status === 401) {
                 this.handleAuthError();
             } else {
@@ -140,7 +132,7 @@ class ChatRoom extends React.Component {
         this.text="";
         message.send((newMessage, status, res) => {
             if (status === 200){
-                this.getNewMessages();
+                this.getMessages();
             } else if (status === 401) {
                 this.handleAuthError();
             } else {
@@ -181,8 +173,7 @@ class ChatRoom extends React.Component {
                         <Paper zDepth={1} style={messageListStyle}>
                             <MessageList 
                                 users={this.state.users}
-                                messages={this.state.messages}
-                                me={this.state.me} />
+                                messages={this.state.messages}/>
                         </Paper>
                         <Paper className="hideOnSmallScreen" zDepth={1} style={userListStyle} >
                             <UserList 
