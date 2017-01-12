@@ -1,5 +1,8 @@
-import { apiUrl } from '../config';
-import { getToken } from '../auth';
+const maxCacheAge = 2 * 60 * 1000; // 2 minutes
+var users = null;
+var usersAge = 0;
+var me = null;
+const apiUrl = window['api_url'];
 
 function tryParseJson(raw){
     try {
@@ -9,93 +12,159 @@ function tryParseJson(raw){
     }
 }
 
-function getAllUsers(cb){
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', apiUrl+'/users');
-    xhr.setRequestHeader("Authorization", getToken());
-    xhr.onload = () => { cb(xhr.status, tryParseJson(xhr.response)); };
-    xhr.send();
-}
-
-function getUserByUsername(username, cb){
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', apiUrl+'/users/'+username);
-    xhr.setRequestHeader("Authorization", getToken());
-    xhr.onload = () => { cb(xhr.status, tryParseJson(xhr.response)); };
-    xhr.send();
-}
-
-function registerNewUser(username, password, name, cb){
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', apiUrl+'/register');
-    xhr.setRequestHeader("Content-type", "application/json");
-    xhr.onload = () => { cb(xhr.status, tryParseJson(xhr.response)); };
-    xhr.send(JSON.stringify({ Username: username, Password: password, DisplayName : name }));
-}
-
-function editUser(username, name, admin, cb){
-    var xhr = new XMLHttpRequest();
-    xhr.open('PUT', apiUrl+'/users/'+username);
-    xhr.setRequestHeader("Authorization", getToken());
-    xhr.setRequestHeader("Content-type", "application/json");
-    xhr.onload = () => { cb(xhr.status, tryParseJson(xhr.response)); };
-    xhr.send(JSON.stringify({ Username: username, DisplayName: name, Admin: admin }));
-}
-
-function deleteUser(username, cb){
-    var xhr = new XMLHttpRequest();
-    xhr.open('DELETE', apiUrl+'/users/'+username);
-    xhr.setRequestHeader("Authorization", getToken());
-    xhr.onload = () => { cb(xhr.status, tryParseJson(xhr.response)); };
-    xhr.send();
-}
-
 export default class User {
     constructor(username, name, admin) {
         this.Username = username;
         this.DisplayName = name;
         this.Admin = admin;
+        this.CacheAge = new Date();
     }
 
     static getAll(cb){
-        getAllUsers((status, res) => {
-            if (status === 200){
-                cb(res.map((u) => { return new User(u.Username, u.DisplayName, u.Admin)}), status, res);
-            } else {
-                cb(null, status, res);
-            }
-        });
+        if (typeof cb !== "function") 
+            return users !== null ? users : {};
+        if (users === null || ((new Date()) - usersAge > maxCacheAge)){
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', apiUrl+'/users');
+            xhr.setRequestHeader("Authorization", localStorage.token);
+            xhr.onload = () => { 
+                const res = tryParseJson(xhr.response);
+                if (xhr.status === 200){
+                    users ={};
+                    res.forEach((u) => {
+                        users[u.Username] = new User(u.Username, u.DisplayName, u.Admin);
+                    });
+                    usersAge = new Date();
+                    cb(users, 200, {});
+                } else {
+                    cb(null, xhr.status, res);
+                }
+            };
+            xhr.send();
+        } else {
+            cb(users, 200, {});
+        }
+    }
+
+    static getMe(cb){
+        if (typeof cb !== "function") 
+            return me !== null 
+                ? me 
+                : { DisplayName: "...", Admin: true };
+        if (me === null || ((new Date()) - me.CacheAge > maxCacheAge)){
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', apiUrl+'/login');
+            xhr.setRequestHeader("Authorization", localStorage.token);
+            xhr.onload = () => { 
+                me = null;
+                const res = tryParseJson(xhr.response);
+                if (xhr.status === 200 && res.Success){
+                    me = new User(res.Account.Username, res.Account.DisplayName, res.Account.Admin);
+                    cb(me, 200, {});
+                } else {
+                    cb(me, xhr.status, res);
+                }
+            };
+            xhr.send();
+        } else {
+            cb(me, 200, {});
+        }
     }
 
     static get(username, cb){
-        getUserByUsername(username, (status, res) => {
-            if (status === 200){
-                cb(new User(res.Username, res.DisplayName, res.Admin), status, res);
-            } else {
-                cb(null, status, res);
+        if (typeof cb !== "function") 
+            return users !== null && users.hasOwnProperty(username) 
+                ? users[username] 
+                : { DisplayName: "..." };
+        if (users.hasOwnProperty(username) && ((new Date()) - users[username].CacheAge < maxCacheAge)){
+            cb(users[username], 200, {});
+            return;
+        }
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', apiUrl+'/users/'+username);
+        xhr.setRequestHeader("Authorization", localStorage.token);
+        xhr.onload = () => { 
+            const res = tryParseJson(xhr.response);
+            let user = null;
+            if (xhr.status === 200){
+                user = new User(res.Username, res.DisplayName, res.Admin);
+                users[user.Username] = user;
             }
-        });
+            cb(user, xhr.status, res);
+        };
+        xhr.send();
     }
 
-    edit(cb){
-        editUser(this.Username, this.DisplayName, this.Admin, (status, res) => {
-            cb(new User(res.Username, res.DisplayName, res.Admin), status, res);
-        });
+    static login(username, password, cb){
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', apiUrl+'/login');
+        xhr.setRequestHeader("Content-type", "application/json");
+        xhr.onload = () => { 
+            var res = tryParseJson(xhr.response);
+            me = null;
+            if (xhr.status === 200 && res.Success){
+                localStorage.token = 'Basic ' + new Buffer(username + ':' + password).toString('base64');
+                me = new User(res.Account.Username, res.Account.DisplayName, res.Account.Admin)
+            }
+            cb(me, xhr.status, res);
+        };
+        xhr.send(JSON.stringify({ Username: username, Password: password }));
+    }
+
+    static logout (cb) {
+        delete localStorage.token;
+        me = null;
+        if (typeof cb === "function") cb();
+    }
+
+    static getToken () {
+        return localStorage.token;
+    }
+
+    static loggedIn () {
+        return !!localStorage.token;
+    }
+
+    update(cb){
+        var xhr = new XMLHttpRequest();
+        xhr.open('PUT', apiUrl+'/users/'+this.Username);
+        xhr.setRequestHeader("Authorization", localStorage.token);
+        xhr.setRequestHeader("Content-type", "application/json");
+        xhr.onload = () => { 
+            const res = tryParseJson(xhr.response);
+            if (xhr.status === 200)
+                users[this.Username] = new User(res.Username, res.DisplayName, res.Admin);
+            cb(users[this.Username], xhr.status, res);
+        };
+        xhr.send(JSON.stringify({ Username: this.Username, DisplayName: this.DisplayName, Admin: this.Admin }));
     }
 
     delete(cb){
-        deleteUser(this.Username, (status, res) => {
-            cb(null, status, res);
-        });
+        var xhr = new XMLHttpRequest();
+        xhr.open('DELETE', apiUrl+'/users/'+this.Username);
+        xhr.setRequestHeader("Authorization", localStorage.token);
+        xhr.onload = () => { 
+            const res = tryParseJson(xhr.response);
+            if (xhr.status === 200)
+                delete users[this.Username];
+            cb(null, xhr.status, res);
+        };
+        xhr.send();
     }
 
     register(password, cb){
-        registerNewUser(this.Username, password, this.DisplayName, (status, res) => {
-            if (status === 200){
-                cb(new User(res.Username, res.DisplayName, res.Admin), status, res);
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', apiUrl+'/register');
+        xhr.setRequestHeader("Content-type", "application/json");
+        xhr.onload = () => { 
+            const res = tryParseJson(xhr.response);
+            if (xhr.status === 200){
+                users[this.Username] = new User(res.Username, res.DisplayName, res.Admin);
+                cb(users[this.Username], xhr.status, res);
             } else {
-                cb(null, status, res.Message);
+                cb(null, xhr.status, res.Message);
             }
-        });
+        };
+        xhr.send(JSON.stringify({ Username: this.Username, Password: password, DisplayName : this.DisplayName }));
     }
 }

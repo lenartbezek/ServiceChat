@@ -10,7 +10,6 @@ import { browserHistory } from 'react-router';
 
 import User from '../models/User';
 import Message from '../models/Message';
-import * as auth from '../auth';
 
 class AdminPanelRow extends React.Component {
     constructor(props, context) {
@@ -40,7 +39,7 @@ class AdminPanelRow extends React.Component {
         var tmpUser = this.state.user;
         tmpUser.Admin = checked;
         this.setState({ pendingEdit: true, user: tmpUser });
-        this.state.user.edit((user, status, res) => {
+        this.state.user.update((user, status, res) => {
             if (status === 200){
                 this.props.onEdit(this.state.user);
                 this.setState({ pendingEdit: false });
@@ -89,63 +88,67 @@ AdminPanelRow.defaultProps = {
 }
 
 class AdminPanel extends React.Component {
+
     constructor(props, context) {
         super(props, context);
-
         this.state = {
-            users: [],
+            users: {},
             messages: [],
-            me: auth.getUser(),
+            me: User.getMe(),
             authError: false,
             connectionError: false
         };
     };
 
     componentDidMount = () => {
-        if (this.state.me.Admin){
-            this.getUserData();
-            this.getMessages();
-        }
+        this.setState({
+            users: User.getAll(),
+            messages: Message.getAll()
+        })
+        this.getData();
     };
 
     handleRefreshClick = () => {
-        if (this.state.me.Admin){
-            this.getUserData();
-            this.getMessages();
-        }
+        this.getData();
+    };
+
+    getData = () => {
+        User.getMe((user, status, res) => {
+            if (status === 200 && user !== null) {
+                this.setState({ me: user });
+                if (user.Admin){
+                    this.getUserData();
+                    this.getMessages();
+                }
+            } else {
+                this.handleTaskError(status);
+            }
+        });
     };
 
     getUserData = () => {
-        auth.refreshUser((status, res) => {
-            if (status === 200 && res.Status){
-                this.setState({ me: auth.getUser() });
-            }
-        });
         User.getAll((userArray, status, res) => {
             if (status === 200) {
                 this.setState({ users: userArray, loaded: true});
-            } else if (status === 401) {
-                this.handleAuthError();
             } else {
-                this.handleConnectionError();
+                this.handleTaskError(status);
             }
         });
-    };
+    }
 
     getMessages = () => {
         Message.getAll((messageArray, status, res) => {
             if (status === 200){
                 this.setState({ messages: messageArray });
-            } else if (status === 401) {
-                this.handleAuthError();
             } else {
-                this.handleConnectionError();
+                this.handleTaskError(status);
             }
         });
     };
 
     handleUserDelete = (user) => {
-        this.setState({ users: this.state.users.filter((u) => u.Username !== user.Username)})
+        delete this.state.users[user.Username];
+        this.setState({ users: this.state.users})
     };
 
     handleUserEdit = (user) => {
@@ -161,18 +164,26 @@ class AdminPanel extends React.Component {
     };
 
     render = () => {
-        var list = this.state.users.map((user) => {
-            return <AdminPanelRow 
+        var list = [];
+        const countMessagesForUser = (user) => {
+            return this.state.messages.filter((m) => {return m.Username === user.Username}).length
+        };
+        for (var username in this.state.users) {
+            if (this.state.users.hasOwnProperty(username)) {
+                var user = this.state.users[username];
+                list.push((
+                    <AdminPanelRow 
                         key={user.Username} 
                         user={user}
                         me={this.state.me}
-                        messageCount={this.state.messages.filter(
-                            (m) => {return m.Username === user.Username}).length}
+                        messageCount={countMessagesForUser(user)}
                         onEdit={this.handleUserEdit}
                         onDelete={this.handleUserDelete}
                         onError={this.handleTaskError}
-                    />;
-        });
+                    />
+                ));
+            }
+        }
         return (
             <div>
             <Overlay

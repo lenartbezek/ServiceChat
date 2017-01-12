@@ -5,5 +5,5 @@
 
 #Konfiguracija
 
-**config.js**:
-  * `apiUrl`: Lokacija REST storitve.
+**index.html**:
+  * `window['api_url']`: Lokacija REST storitve.

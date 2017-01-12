@@ -10,12 +10,18 @@ import IconClose from 'material-ui/svg-icons/navigation/close';
 import IconButton from 'material-ui/IconButton';
 import FlatButton from 'material-ui/FlatButton';
 import { browserHistory } from 'react-router';
-
-import * as auth from '../auth';
+import User from '../models/User';
 
 class MainAppBar extends React.Component {
     state = {
+        me: User.getMe(),
         drawerOpen: false
+    }
+
+    componentDidMount = () => {
+        User.getMe((user, status, res) => {
+            if (user != null) this.setState({ me: user });
+        });
     }
 
     handleDrawerOpen = () => {
@@ -27,7 +33,7 @@ class MainAppBar extends React.Component {
     }
 
     handleLogoutClick = () => {
-        auth.logout(() => { browserHistory.push('/login'); })
+        User.logout(() => { browserHistory.push('/login'); })
     }
 
     render = () => {
@@ -44,7 +50,7 @@ class MainAppBar extends React.Component {
                     </IconButton>
                     <Divider />
                     <div style={{ textAlign: "center"}}>
-                        <p>Prijavljeni ste kot <br /><b>{auth.getUser().DisplayName}</b></p>
+                        <p>Prijavljeni ste kot <br /><b>{this.state.me.DisplayName}</b></p>
                     </div>
                     <MenuItem 
                         primaryText="Odjavi se" 

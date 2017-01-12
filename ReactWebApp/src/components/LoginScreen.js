@@ -6,7 +6,7 @@ import Paper from 'material-ui/Paper';
 import { browserHistory } from 'react-router';
 import { titleStyle, overlayStyle } from '../styles'
 
-import * as auth from '../auth';
+import User from '../models/User';
 
 const messageStyle = {
     margin: "2rem"
@@ -47,11 +47,11 @@ class LoginScreen extends React.Component {
     };
 
     componentDidMount = () => {
-        if (auth.loggedIn()){
-            auth.refreshUser((status, res) => {
-                if (status === 200 && res.Success){
+        if (User.loggedIn()){
+            User.getMe((user, status, res) => {
+                if (user != null){
                     this.setState({
-                        message: "Prijavljeni ste kot "+res.Account.DisplayName+".",
+                        message: "Prijavljeni ste kot "+user.DisplayName+".",
                         loggedIn: true,
                         showOptions: true
                     });
@@ -84,7 +84,7 @@ class LoginScreen extends React.Component {
 
     handleLogOut = () => {
         this.setState({ showOptions: false });
-        auth.logout(() => {
+        User.logout(() => {
             setTimeout( () => {
                 this.setState({
                     message: "Uspešno ste se odjavili.",

@@ -7,6 +7,7 @@ import {List, ListItem} from 'material-ui/List';
 import ActionAccountCircle from 'material-ui/svg-icons/action/account-circle';
 import moment from 'moment';
 import { listStyle } from '../styles';
+import User from '../models/User';
 
 moment.locale("sl-SI");
 
@@ -36,10 +37,7 @@ class MessageList extends React.Component {
             );
         var list = [];
         this.props.messages.forEach((message) => {
-            let user = "Neznani uporabnik";
-            try {
-                user = this.props.users[message.Username]
-            } catch (error) { }
+            const user = User.get(message.Username);
             var item = (
                 <ListItem key={message.Id}>
                     <div style={messageChipBarStyle}>
@@ -67,9 +65,7 @@ class MessageList extends React.Component {
 }
 
 MessageList.defaultProps = {
-    users: {},
-    messages: [],
-    me: null,
+    messages: []
 };
 
 export default MessageList;

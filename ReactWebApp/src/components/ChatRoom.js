@@ -10,7 +10,6 @@ import { browserHistory } from 'react-router';
 
 import User from '../models/User';
 import Message from '../models/Message';
-import * as auth from '../auth';
 
 const userListStyle = {
     width: "16rem",
@@ -38,21 +37,30 @@ const containerStyle = {
 class ChatRoom extends React.Component {
     text = "";
     getUserDataInterval = null;
-    getNewMessagesInterval = null;
+    getMessagesInterval = null;
 
-    state = {
-        messages: [],
-        users: null,
-        me: auth.getUser(),
-        authError: false,
-        connectionError: false
-    };
+    constructor(props) {
+        super(props);
+        this.state = {
+            users: {},
+            messages: [],
+            me: User.getMe(),
+            authError: false,
+            connectionError: false
+        };
+    }
 
     componentDidMount = () => {
+        this.setState({
+            users: User.getAll(),
+            messages: Message.getAll()
+        })
+        this.scrollToBottom();
+        
         this.getUserData();
-        this.getNewMessages();
-        this.getUserDataInterval = window.setInterval(this.getUserData, 15000);
-        this.getNewMessagesInterval = window.setInterval(this.getNewMessages, 5000);
+        this.getMessages();
+        this.getUserDataInterval = window.setInterval(this.getUserData, 60000);
+        this.getMessagesInterval = window.setInterval(this.getMessages, 5000);
 
         var rc = this;
         document.getElementById("messageTextField")
@@ -66,26 +74,32 @@ class ChatRoom extends React.Component {
     componentWillUnmount = () => {
         if (this.getUserDataInterval !== null)
             window.clearInterval(this.getUserDataInterval);
-        if (this.getNewMessagesInterval !== null)
-            window.clearInterval(this.getNewMessagesInterval);
+        if (this.getMessagesInterval !== null)
+            window.clearInterval(this.getMessagesInterval);
+    }
+
+    scrollToBottom = () => {
+        try {
+            var listDiv = document.getElementById("messageList");
+            listDiv.scrollTop = listDiv.scrollHeight;
+        } catch (error) {
+            //
+        }
     }
 
     getUserData = () => {
-        auth.refreshUser((status, res) => {
-            if (status === 200 && res.Status){
-                this.setState({ me: auth.getUser() });
+        User.getMe((user, status, res) => {
+            if (user != null) {
+                this.setState({ me: user });
+            } else if (status === 401) {
+                this.handleAuthError();
+            } else {
+                this.handleConnectionError();
             }
         });
-        User.getAll((userArray, status, res) => {
+        User.getAll((users, status, res) => {
             if (status === 200) {
-                let userDict = null;
-                if (typeof userArray !== 'undefined'){
-                    userDict = {};
-                    userArray.forEach((user) => {
-                        userDict[user.Username] = user;
-                    });
-                }
-                this.setState({ users: userDict });
+                this.setState({ users: users });
             } else if (status === 401) {
                 this.handleAuthError();
             } else {
@@ -98,36 +112,21 @@ class ChatRoom extends React.Component {
         Message.getAll((messageArray, status, res) => {
             if (status === 200){
                 this.setState({ messages: messageArray });
-                var listDiv = document.getElementById("messageList");
-                listDiv.scrollTop = listDiv.scrollHeight;
+                this.scrollToBottom();
+                for (var i = 0; i < messageArray.length; i++){
+                    var m = messageArray[i];
+                    if (User.get(m.Username) == null){
+                        User.get(m.Username, (user, status, res) => {
+                            this.setState({ messages: messageArray });
+                        });
+                    }
+                }
             } else if (status === 401) {
                 this.handleAuthError();
             } else {
                 this.handleConnectionError();
             }
         });
-    };
-
-    getNewMessages = () => {
-        if (this.state.messages.length > 0){
-            var lastId = this.state.messages[this.state.messages.length - 1].Id;
-            Message.getSince(lastId, (newMessages, status, res) => {
-                if (status === 200){
-                    if (newMessages.length > 0){
-                        var allMessages = this.state.messages.concat(newMessages);
-                        this.setState({ messages: allMessages });
-                        var listDiv = document.getElementById("messageList");
-                        listDiv.scrollTop = listDiv.scrollHeight;
-                    }
-                } else if (status === 401) {
-                    this.handleAuthError();
-                } else {
-                    this.handleConnectionError();
-                }
-            });
-        } else {
-            this.getMessages();
-        }
     };
 
     handleTextChange = (e) => {
