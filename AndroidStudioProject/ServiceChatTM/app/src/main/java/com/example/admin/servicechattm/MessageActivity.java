@@ -9,6 +9,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -96,6 +98,23 @@ public class MessageActivity extends AppCompatActivity
         };
 
         updateHandler.post(updateData);
+    }
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_messages, menu);
+        return true;
+
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_logout:
+                Auth.deleteToken();
+                finish();
+                startActivity(new Intent(this, LoginActivity.class));
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void sendMessage(){

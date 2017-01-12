@@ -20,7 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true" android:layout_alignParentStart="true"
-            android:id="@+id/messageRow" android:background="@color/colorPrimary" android:paddingTop="4dp"
+            android:id="@+id/messageRow" android:background="@color/colorSendBar" android:paddingTop="4dp"
             android:paddingBottom="4dp">
         <EditText
                 android:layout_width="wrap_content"
