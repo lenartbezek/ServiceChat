@@ -4,8 +4,7 @@ import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 import Overlay from './Overlay';
-
-import auth from '../auth';
+import User from '../models/User';
 
 const dialogStyle = {
     maxWidth: '25rem',
@@ -54,7 +53,7 @@ class LoginDialog extends React.Component {
     handleLoginChatClick = () => {
         if (this.checkRequiredFields()){
             this.setState({ waitingForResponse: true });
-            auth.login(this.username, this.password, (status, response) =>{
+            User.login(this.username, this.password, (user, status, response) =>{
                 this.setState({ waitingForResponse: false });
                 if (status === 200 && response.Success){
                     this.handleClose();
@@ -76,10 +75,10 @@ class LoginDialog extends React.Component {
     handleLoginAdminClick = () => {
         if (this.checkRequiredFields()){
             this.setState({ waitingForResponse: true });
-            auth.login(this.username, this.password, (status, response) =>{
+            User.login(this.username, this.password, (user, status, response) =>{
                 this.setState({ waitingForResponse: false });
                 if (status === 200 && response.Success){
-                    if (response.Admin){
+                    if (user.Admin){
                         this.handleClose();
                         this.props.onLoginAdmin();
                     } else {

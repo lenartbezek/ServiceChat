@@ -2,34 +2,11 @@ import React from 'react';
 import LoginDialog from './LoginDialog';
 import RegisterDialog from './RegisterDialog';
 import FlatButton from 'material-ui/FlatButton';
+import Paper from 'material-ui/Paper';
 import { browserHistory } from 'react-router';
-
-import auth from '../auth.js';
+import { titleStyle, overlayStyle } from '../styles'
 
 import User from '../models/User';
-
-const overlayStyle = {
-    position: "fixed",
-    width: "100%",
-    height: "100%",
-    top: 0,
-    left: 0,
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center"
-}
-
-const titleStyle = {
-    top: "-2rem",
-    fontSize: "4rem",
-    fontWeight: 100,
-    width: "100%",
-    color: "white",
-    background: "#039BE5",
-    textAlign: "center",
-    padding : "2rem"
-}
 
 const messageStyle = {
     margin: "2rem"
@@ -43,7 +20,7 @@ const buttonRowStyle = {
 }
 
 const buttonStyle = {
-    width: "16rem",
+    width: "12rem",
     margin: "auto",
     marginTop: "0.5rem"
 };
@@ -70,8 +47,8 @@ class LoginScreen extends React.Component {
     };
 
     componentDidMount = () => {
-        if (auth.loggedIn()){
-            User.me((user, status, res) => {
+        if (User.loggedIn()){
+            User.getMe((user, status, res) => {
                 if (user != null){
                     this.setState({
                         message: "Prijavljeni ste kot "+user.DisplayName+".",
@@ -107,7 +84,7 @@ class LoginScreen extends React.Component {
 
     handleLogOut = () => {
         this.setState({ showOptions: false });
-        auth.logout(() => {
+        User.logout(() => {
             setTimeout( () => {
                 this.setState({
                     message: "Uspešno ste se odjavili.",
@@ -136,6 +113,11 @@ class LoginScreen extends React.Component {
                         style={buttonStyle}
                         disabled={!this.state.showOptions}
                         onClick={this.handleLogOut} />
+                    <FlatButton 
+                        label="Nazaj v klepetalnico" 
+                        style={buttonStyle}
+                        disabled={!this.state.showOptions}
+                        onClick={this.handleLoginChatSuccess} />
                 </div>
             );
         } else {
@@ -151,7 +133,7 @@ class LoginScreen extends React.Component {
         }
         return (
             <div style={overlayStyle}>
-                <span style={titleStyle}>ServiceChat</span>
+                <Paper style={titleStyle}>ServiceChat</Paper>
                 <span style={{...messageStyle, ...fadeStyle}}>{this.state.message}</span>
                 {options}
             </div>

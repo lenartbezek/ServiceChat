@@ -2,7 +2,7 @@ import React from 'react';
 
 
 const overlayStyle = {
-    position: "fixed",
+    position: "absolute",
     zIndex: 3,
     width: "100%",
     height: "100%",

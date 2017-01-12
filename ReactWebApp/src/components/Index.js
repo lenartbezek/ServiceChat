@@ -1,8 +1,10 @@
 import React from 'react';
+import MainAppBar from './MainAppBar';
 
 import { withRouter } from 'react-router'
 
 const fullscreenWrapperStyle = {
+    background: "#80DEEA",
     position: "fixed",
     width: "100%",
     height: "100%",
@@ -12,8 +14,8 @@ const fullscreenWrapperStyle = {
 
 const containerStyle = {
     maxWidth: "100%",
+    height: "calc(100% - 64px)",
     margin: "auto",
-    height: "100%",
     width: "60rem"
 }
 
@@ -21,6 +23,7 @@ class Index extends React.Component {
     render = () => {
         return (
             <div style={fullscreenWrapperStyle}>
+                <MainAppBar />
                 <div style={containerStyle}>
                     {this.props.children}
                 </div>

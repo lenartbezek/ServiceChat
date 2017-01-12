@@ -1,5 +1,5 @@
-import { apiUrl } from '../config';
-import auth from '../auth';
+const apiUrl = window['api_url'];
+import User from './User';
 
 function tryParseJson(raw){
     try {
@@ -9,30 +9,7 @@ function tryParseJson(raw){
     }
 }
 
-function getAllMessages(cb){
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', apiUrl+'/messages');
-    xhr.setRequestHeader("Authorization", auth.getToken());
-    xhr.onload = () => { cb(xhr.status, tryParseJson(xhr.response)); };
-    xhr.send();
-}
-
-function getMessagesSince(id, cb){
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', apiUrl+'/messages/'+id);
-    xhr.setRequestHeader("Authorization", auth.getToken());
-    xhr.onload = () => { cb(xhr.status, tryParseJson(xhr.response)); };
-    xhr.send();
-}
-
-function sendMessage(text, cb){
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', apiUrl+'/send');
-    xhr.setRequestHeader("Content-type", "application/json");
-    xhr.setRequestHeader("Authorization", auth.getToken());
-    xhr.onload = () => { cb(xhr.status, tryParseJson(xhr.response)); };
-    xhr.send(JSON.stringify({ Text: text }));
-}
+var messages = [];
 
 export default class Message {
     constructor(text, username, id, time) {
@@ -43,37 +20,40 @@ export default class Message {
     }
 
     static getAll(cb){
-        getAllMessages((status, res) => {
-            if (status === 200){
-                cb(res.map((m) => { return new Message(m.Text, m.Username, m.Id, m.Time)}), status, res);
+        if (typeof cb !== "function") return messages;
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', apiUrl+'/messages');
+        xhr.setRequestHeader("Authorization", User.getToken());
+        xhr.onload = () => { 
+            const res = tryParseJson(xhr.response);
+            if (xhr.status === 200){
+                messages = res.map((m) => { return new Message(m.Text, m.Username, m.Id, m.Time)});
+                cb(messages, xhr.status, res);
             } else {
-                cb(null, status, res);
+                cb(null, xhr.status, res);
             }
-        });
-    }
-
-    static getSince(id, cb){
-        getMessagesSince(id, (status, res) => {
-            if (status === 200){
-                cb(res.map((m) => { return new Message(m.Text, m.Username, m.Id, m.Time)}), status, res);
-            } else {
-                cb(null, status, res);
-            }
-        });
+        };
+        xhr.send();
     }
 
     send(cb){
-        sendMessage(this.Text, (status, res) => {
-            if (status === 200){
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', apiUrl+'/send');
+        xhr.setRequestHeader("Content-type", "application/json");
+        xhr.setRequestHeader("Authorization", User.getToken());
+        xhr.onload = () => { 
+            const res = tryParseJson(xhr.response);
+            if (xhr.status === 200){
                 var newMessage = new Message(res.Text, res.Username, res.Id, res.Time);
                 this.Id = newMessage.Id;
                 this.Text = newMessage.Text;
                 this.Username = newMessage.Username;
                 this.Time = newMessage.Time;
-                cb(newMessage, status, res);
+                cb(newMessage, xhr.status, res);
             } else {
-                cb(null, status, res.Message);
+                cb(null, xhr.status, res.Message);
             }
-        });
+        };
+        xhr.send(JSON.stringify({ Text: this.Text }));
     }
 }

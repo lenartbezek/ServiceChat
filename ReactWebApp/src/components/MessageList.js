@@ -6,6 +6,7 @@ import Divider from 'material-ui/Divider';
 import {List, ListItem} from 'material-ui/List';
 import ActionAccountCircle from 'material-ui/svg-icons/action/account-circle';
 import moment from 'moment';
+import { listStyle } from '../styles';
 
 moment.locale("sl-SI");
 
@@ -19,11 +20,6 @@ const timeStyle = {
     fontSize: "0.7em",
     textAlign: "right",
     flex: 1
-}
-
-const listStyle = {
-    height: "calc(100% - 48px)",
-    overflowY: "auto"
 }
 
 class MessageList extends React.Component {
@@ -40,16 +36,15 @@ class MessageList extends React.Component {
             );
         var list = [];
         this.props.messages.forEach((message) => {
-            let user = "Neznani uporabnik";
-            try {
-                user = this.props.users[message.Username]
-            } catch (error) { }
+            const name = this.props.users.hasOwnProperty(message.Username)
+                ? this.props.users[message.Username].DisplayName
+                : "...";
             var item = (
                 <ListItem key={message.Id}>
                     <div style={messageChipBarStyle}>
                         <Chip>
                             <Avatar icon={<ActionAccountCircle />} />
-                            {user.DisplayName}
+                            {name}
                         </Chip>
                         <span style={timeStyle}>{moment(message.Time).fromNow()}</span>
                     </div>
@@ -72,8 +67,7 @@ class MessageList extends React.Component {
 
 MessageList.defaultProps = {
     users: {},
-    messages: [],
-    me: null,
+    messages: []
 };
 
 export default MessageList;
