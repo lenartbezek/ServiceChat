@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">ServiceChat</string>
+    <string name="api_base_url">http://is-servicechat.azurewebsites.net/api</string>
+    <string name="title_activity_msg">MsgActivity</string>
+
+    <string name="error_usernotfound">User not found</string>
+    <string name="error_invalidpassword">Invalid password</string>
+    <string name="error_connection">Couldn\'t connect to the server</string>
+    <string name="error_invalidcredentials">Invalid username and password combination</string>
+    <string name="hint_message">Say something ...</string>
+    <string name="action_ok">OK</string>
+</resources>
