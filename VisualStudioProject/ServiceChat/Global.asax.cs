@@ -54,6 +54,7 @@ namespace ServiceChat
                 name: "api",
                 routeTemplate: "api/{controller}/{id}",
                 defaults: new { id = RouteParameter.Optional });
+
             routes.MapPageRoute("Default", "{*anything}", "~/index.html");
         }
     }

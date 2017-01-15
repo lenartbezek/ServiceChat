@@ -35,6 +35,9 @@ Oba odjemalca avtomatsko osvežujeta sporočila.
 Delovanje spletne klepetalnice bi bilo treba preseliti na WebSocket protokol za obojestranske povezave.
 Zaradi varnosti uporabnikov bi bilo treba sprejemati varne povezave preko https, saj lahko v trenutni situacijo gesla prestreže kdorkoli.
 
+# Entitetno relacijski diagram
+![ER diagram](http://i.imgur.com/AV90F0b.png)
+
 # Spletna klepetalnica 
 ![Spletna klepetalnica](https://puu.sh/tkcWq/f5170d3471.png)
 

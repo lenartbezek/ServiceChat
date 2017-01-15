@@ -4,7 +4,6 @@ using static ServiceChat.Authentication;
 
 namespace ServiceChat.Controllers
 {
-    [RoutePrefix("api/users")]
     public class UsersController : ApiController
     {
         // Get all accounts

@@ -4,7 +4,6 @@ using static ServiceChat.Authentication;
 
 namespace ServiceChat.Controllers
 {
-    [RoutePrefix("api/send")]
     public class SendController : ApiController
     {
         // Posts a new message
@@ -30,7 +29,6 @@ namespace ServiceChat.Controllers
         }
 
         // Edits a message
-        [Route("/{id}")]
         public object Put(int id, [FromBody]dynamic data)
         {
             if (data == null ||

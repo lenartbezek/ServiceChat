@@ -87,6 +87,10 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="App_Data\database.mdf" />
+    <Content Include="App_Data\database_log.ldf">
+      <DependentUpon>database.mdf</DependentUpon>
+    </Content>
     <Content Include="favicon.ico" />
     <Content Include="index.html" />
     <Content Include="packages.config" />
@@ -102,10 +106,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="App_Data\chatdb.mdf" />
-    <Content Include="App_Data\chatdb_log.ldf">
-      <DependentUpon>chatdb.mdf</DependentUpon>
-    </Content>
     <Content Include="Global.asax" />
     <Content Include="static\css\main.4b7e586f.css" />
     <Content Include="static\js\main.2b3687e5.js" />
@@ -140,7 +140,7 @@
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
-          <UseIIS>True</UseIIS>
+          <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>11170</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>

@@ -6,4 +6,4 @@
 #Konfiguracija
 
 **index.html**:
-  * `window['api_url']`: Lokacija REST storitve.
+  * `window.api_url`: Lokacija REST storitve.

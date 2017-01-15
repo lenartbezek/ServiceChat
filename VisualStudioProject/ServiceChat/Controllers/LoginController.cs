@@ -5,7 +5,6 @@ using static ServiceChat.Authentication;
 
 namespace ServiceChat.Controllers
 {
-    [RoutePrefix("api/login")]
     public class LoginController : ApiController
     {
         [DataContract]

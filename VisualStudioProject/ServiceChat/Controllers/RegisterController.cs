@@ -3,7 +3,6 @@ using ServiceChat.Models;
 
 namespace ServiceChat.Controllers
 {
-    [RoutePrefix("api/register")]
     public class RegisterController : ApiController
     {
 

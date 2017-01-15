@@ -151,13 +151,13 @@ public class MessageActivity extends AppCompatActivity
     private void handleAuthorizationError(){
         updateHandler.removeCallbacks(updateData);
         Auth.deleteToken();
-        buildErrorAlert("auth error", "");
+        buildErrorAlert("Authentication error", "Your account may have been disabled. Please log in again.");
     }
 
     private void handleConnectionError(){
         updateHandler.removeCallbacks(updateData);
         Auth.deleteToken();
-        buildErrorAlert("connection error", "");
+        buildErrorAlert("Connection error", "Error connecting to the server. Please check your internet connection.");
     }
 
     private void buildErrorAlert(String title, String message){

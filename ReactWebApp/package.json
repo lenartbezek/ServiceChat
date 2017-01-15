@@ -1,6 +1,6 @@
 {
-  "name": "demo",
-  "version": "0.1.0",
+  "name": "servicechat",
+  "version": "1.0.0",
   "private": true,
   "devDependencies": {
     "react-scripts": "0.8.4"
