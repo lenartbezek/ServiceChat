@@ -6,10 +6,10 @@ http://is-servicechat.azurewebsites.net/
 **REST API**:   
 http://is-servicechat.azurewebsites.net/api  
 
-Račun z administratorskimi pravicami:  
+**Račun z administratorskimi pravicami:**    
 **UN:** admin   **PW:** Geslo.01
 
-Račun z navadnimi pravicami:  
+**Račun z navadnimi pravicami:**  
 **UN:** user **PW:** User!!1122
 
 ## Delitev nalog
