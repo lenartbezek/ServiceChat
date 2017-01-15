@@ -6,13 +6,8 @@ http://is-servicechat.azurewebsites.net/
 **REST API**:   
 http://is-servicechat.azurewebsites.net/api  
 
-**Račun z administratorskimi pravicami:**    
 **UN:** admin   **PW:** Geslo.01
 
-**Račun z navadnimi pravicami:**  
-**UN:** user **PW:** User!!1122
-
-## Delitev nalog
 **Lenart Bezek (63130012)**:
 
 * React spletni vmesnik
@@ -37,7 +32,7 @@ Oba odjemalca avtomatsko osvežujeta sporočila.
 
 ### Predlagane izboljšave
 Delovanje spletne klepetalnice bi bilo treba preseliti na WebSocket protokol za obojestranske povezave.
-Zaradi varnosti uporabnikov bi bilo treba sprejemati varne povezave preko https, saj lahko v trenutni situacijo gesla prestreže kdorkoli.
+Zaradi varnosti uporabnikov bi bilo treba sprejemati varne povezave preko https, saj lahko v trenutni situaciji geslo prestreže kdorkoli.
 
 # Entitetno relacijski diagram
 ![ER diagram](http://i.imgur.com/AV90F0b.png)
