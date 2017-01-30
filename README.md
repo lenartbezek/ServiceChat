@@ -3,10 +3,6 @@ Tretja seminarska naloga pri predmetu Informacijski Sistemi UNI-LJ FRI.
 
 **Spletna aplikacija**:  
 http://is-servicechat.azurewebsites.net/  
-**REST API**:   
-http://is-servicechat.azurewebsites.net/api  
-
-**UN:** admin   **PW:** Geslo.01
 
 **Lenart Bezek (63130012)**:
 
@@ -33,9 +29,6 @@ Oba odjemalca avtomatsko osvežujeta sporočila.
 ### Predlagane izboljšave
 Delovanje spletne klepetalnice bi bilo treba preseliti na WebSocket protokol za obojestranske povezave.
 Zaradi varnosti uporabnikov bi bilo treba sprejemati varne povezave preko https, saj lahko v trenutni situaciji geslo prestreže kdorkoli.
-
-# Entitetno relacijski diagram
-![ER diagram](http://i.imgur.com/AV90F0b.png)
 
 # Spletna klepetalnica 
 ![Spletna klepetalnica](https://puu.sh/tkcWq/f5170d3471.png)
